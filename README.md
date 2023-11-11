@@ -16,4 +16,4 @@ It is meant to be a yard-stick measure of exactly the inputs given, which are a 
 
 If you would like to determine the true value of a company, you'd be better off purchasing Elon's new time machine cyber-truck thing - that's what it does right?
 
-![quickval cmd line example](files/quickval.gif "Example GIF")
+<img src="docs/images/quickval.gif" width="800" alt="quickval cmd line example">
