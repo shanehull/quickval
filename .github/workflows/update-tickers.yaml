@@ -1,0 +1,21 @@
+name: Update Tickers
+
+on:
+  schedule:
+    - cron: "13 0 * * 1-5"
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Fetch Tickers
+        run: go run ./cmd/fetch_tickers/fetch_tickers.go --api-key=${{ secrets.QUICKFS_KEY }}
+      - name: Commit Changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: tickers/*
+          message: "chore: update tickers [skip ci]"

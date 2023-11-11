@@ -1,0 +1,16 @@
+branches:
+  - name: release
+    channel: latest
+  - name: main
+    prerelease: pre
+    channel: pre
+plugins:
+  - "@semantic-release/commit-analyzer"
+  - "@semantic-release/release-notes-generator"
+  - - "@semantic-release/git"
+    - assets:
+        - "tickers/*"
+      message: "chore(release): update tickers [skip ci]\n\n${nextRelease.notes}"
+  - - "@semantic-release/github"
+    - assets:
+        - build/*
