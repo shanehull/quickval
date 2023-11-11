@@ -15,3 +15,5 @@ Like any valuation model that aims to predict future business prospects, it is n
 It is meant to be a yard-stick measure of exactly the inputs given, which are a representation of the history at best, and not a representation of future value.
 
 If you would like to determine the true value of a company, you'd be better off purchasing Elon's new time machine cyber-truck thing - that's what it does right?
+
+![quickval cmd line example](files/quickval.gif "Example GIF")
