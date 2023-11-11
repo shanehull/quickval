@@ -477,9 +477,11 @@ func fetchTickers(country string) ([]string, error) {
 			// data successfully loaded from local cache
 
 			// refresh local cache in the background
-			if err := updateLocalCache(country, cacheFilePath); err != nil {
-				log.Printf("failed to update local cache: %s", err)
-			}
+			go func() {
+				if err := updateLocalCache(country, cacheFilePath); err != nil {
+					log.Printf("failed to update local cache: %s", err)
+				}
+			}()
 			return searchTickers, nil
 		}
 	}
@@ -656,7 +658,6 @@ func selectTicker(country string, apiKey string) string {
 }
 
 func selectCountry() string {
-
 	searcher := func(input string, index int) bool {
 		ticker := strings.ToLower(countryCodes[index])
 		input = strings.Replace(strings.ToLower(input), " ", "", -1)
