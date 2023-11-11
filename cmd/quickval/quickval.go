@@ -31,7 +31,7 @@ var (
 	countryCodes    = []string{"US", "AT", "AU", "BE", "CA", "CH", "DE", "DK", "ES", "FI", "FI", "FR", "GR", "IT", "LN", "MM", "NL", "NO", "NZ", "PL", "SE"}
 	searchTickers   []string
 	cacheDir        = "/tmp/quickval"
-	ghTickersURLFmt = "https://raw.githubusercontent.com/shanehull/quickval-wip/main/tickers/%s.json"
+	ghTickersURLFmt = "https://raw.githubusercontent.com/shanehull/quickval/main/tickers/%s.json"
 )
 
 var (
