@@ -340,7 +340,10 @@ func main() {
 		},
 		Before: func(cCtx *cli.Context) error {
 			if cCtx.NumFlags() > 0 && cCtx.NArg() == 0 {
-				cli.ShowAppHelp(cCtx)
+				err := cli.ShowAppHelp(cCtx)
+				if err != nil {
+					return err
+				}
 				return errors.New("a command is required")
 			}
 
@@ -454,7 +457,10 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 			writer.Data(&data)
 			writer.DiscountRate(discountRate)
 		default:
-			cli.Exit("unsupported discount rate option", 127)
+			err := cli.Exit("unsupported discount rate option", 127)
+			if err != nil {
+				return data, 0, 0, err
+			}
 		}
 	}
 
@@ -471,7 +477,9 @@ func fetchTickers(country string) ([]string, error) {
 			// data successfully loaded from local cache
 
 			// refresh local cache in the background
-			go updateLocalCache(country, cacheFilePath)
+			if err := updateLocalCache(country, cacheFilePath); err != nil {
+				log.Printf("failed to update local cache: %s", err)
+			}
 			return searchTickers, nil
 		}
 	}
