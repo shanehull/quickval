@@ -49,6 +49,7 @@ var (
 func main() {
 
 	app := &cli.App{
+		Usage:                "Perform quick valuations using the QuickFS API",
 		EnableBashCompletion: true,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -300,8 +301,6 @@ func main() {
 
 						growthRate = promptFloat("Growth Rate", cagr, growthPromptInfo)
 					}
-
-					fmt.Printf("%+v", data)
 
 					if len(data.CFFDividends) < 1 {
 						return errors.New("no dividend history")

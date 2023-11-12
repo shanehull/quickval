@@ -30,7 +30,7 @@ You can simply run `quickval` with no arguments to get started, however, to avoi
 
 ```bash
 NAME:
-   quickval - A new cli application
+   quickval - Perform quick valuations using QuickFS API
 
 USAGE:
    quickval [global options] command [command options] [arguments...]
