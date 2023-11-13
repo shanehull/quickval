@@ -518,12 +518,18 @@ func fetchTickersFromGH(country string) ([]string, error) {
 		return nil, fmt.Errorf("received non-200 status code: %d", resp.StatusCode)
 	}
 
-	var tickers []string
-	if err := json.NewDecoder(resp.Body).Decode(&tickers); err != nil {
+	var fetchedTickers []string
+	if err := json.NewDecoder(resp.Body).Decode(&fetchedTickers); err != nil {
 		return nil, fmt.Errorf("error decoding response: %w", err)
 	}
 
-	return tickers, nil
+	var ghTickers []string
+	for _, t := range fetchedTickers {
+		tickerSplit := strings.Split(t, ":")
+		ghTickers = append(ghTickers, tickerSplit[0])
+	}
+
+	return ghTickers, nil
 }
 
 func updateLocalCache(country, cacheFilePath string) error {
