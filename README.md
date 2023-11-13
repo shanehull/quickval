@@ -87,9 +87,9 @@ $$CV = (a / X) * 100$$
 
 $$
 Where \ a = \ Standard \ Deviation
-\\
+\\\
 and
-\\
+\\\
 X = \ Mean
 $$
 
