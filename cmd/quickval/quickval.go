@@ -406,7 +406,7 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 
 			writer.Data(&data)
 			writer.WACC(discountRate, equityRiskPremium, riskFreeRate, &data)
-		case "FCF-CV Weighted WACC":
+		case "CV Weighted WACC":
 			equityRiskPremium = cCtx.Float64("risk-premium")
 			if equityRiskPremium == 0.0 {
 				equityRiskPremium = promptFloat("Equity Risk Premium", 0.05, erpPromptInfo)
@@ -760,7 +760,7 @@ func promptFloat(label string, def float64, info string) float64 {
 func selectDiscountRateOpt() string {
 	s := promptui.Select{
 		Label: "Discount Rate Options",
-		Items: []string{"WACC", "FCF-CV Weighted WACC", "Custom Input"},
+		Items: []string{"WACC", "CV Weighted WACC", "Custom Input"},
 	}
 
 	fmt.Println()
