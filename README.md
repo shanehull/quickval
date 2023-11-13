@@ -83,10 +83,18 @@ It uses a Coefficient of Variance - a measure of relative variance in comparison
 
 It is calculated like so:
 
-$$CV = (σ / X̄) * 100$$
+$$CV = (a / X)$$
 
-$$Where \ σ = \ Standard \ Deviation$$
-$$and$$
-$$ X̄ = \ Mean$$
+$$
+Where \ a = \ Standard \ Deviation
+$$
+
+$$
+and
+$$
+
+$$
+X = \ Mean
+$$
 
 More studies to come on this concept in the future...
