@@ -83,7 +83,7 @@ It uses a Coefficient of Variance - a measure of relative variance in comparison
 
 It is calculated like so:
 
-$$CV = (a / X) * 100$$
+$$CV = (a / X)$$
 
 $$
 Where \ a = \ Standard \ Deviation
