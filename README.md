@@ -70,3 +70,23 @@ OPTIONS:
    --fy-history value    override the growth rate with your own number (default: 0)
    --help, -h            show help
 ```
+
+### CV (Coefficient of Variance) Weighted WACC:
+
+You may notice an option when selecting the Discount Rate calculation method called "CV Weighted WACC".
+
+This is an alternative, experimental option for weighing the Cost of Capital. It's a replacement for the "preposterous" (in Seth Klarman's words) use of Beta as a measure of risk.
+
+It aims to gain a value edge, ignoring price altogether.
+
+It uses a Coefficient of Variance - a measure of relative variance in comparison to the mean of a set of numbers. In this case, the set of numbers is Free Cash Flow, or Dividends paid when performing a DDM valuation model.
+
+It is calculated like so:
+
+$$CV = (σ / X̄) * 100$$
+
+$$Where \ σ = \ Standard \ Deviation$$
+$$and$$
+$$ X̄ = \ Mean$$
+
+More studies to come on this concept in the future...
