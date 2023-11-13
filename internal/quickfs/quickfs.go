@@ -171,7 +171,7 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 	return data, nil
 }
 
-// Gets all supported comapnies for the specified (ISO Alpha-2) country code, e.g; ["AAPL:US", ...].
+// Gets all supported companies for the specified (ISO Alpha-2) country code, e.g; ["AAPL:US", ...].
 func (q *quickFS) GetCompanies(country string) (Companies, error) {
 	var companies Companies
 
