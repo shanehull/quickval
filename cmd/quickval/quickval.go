@@ -47,7 +47,6 @@ var (
 )
 
 func main() {
-
 	app := &cli.App{
 		Usage:                "Perform quick valuations using the QuickFS API",
 		EnableBashCompletion: true,
@@ -108,27 +107,9 @@ func main() {
 						return err
 					}
 
-					growthRate := cCtx.Float64("growth-rate")
-					if growthRate == 0.00 {
-						cagr, err := calc.CAGR(data.FCFHistory)
-						if err != nil {
-							return err
-						}
-
-						growthRate = promptFloat("Growth Rate", cagr, growthPromptInfo)
-					}
-
-					currentFCF := cCtx.Int("current-fcf")
-					var recentFCF int
-					if currentFCF == 0 {
-						recentFCF = data.FCFHistory[len(data.FCFHistory)-1]
-						currentFCF = promptInt("Current FCF", recentFCF, fcfPromptInfo)
-					}
-
-					exitMultiple := cCtx.Float64("exit-multiple")
-					if exitMultiple == 0.00 {
-						exitMultiple = promptFloat("Exit Multiple", 16.0, exitPromptInfo)
-					}
+					growthRate := getFlagOrPromptFloatWithCAGR(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data)
+					currentFCF := getFlagOrPromptInt(cCtx, "current-fcf", "Current FCF", fcfPromptInfo, data.FCFHistory[len(data.FCFHistory)-1])
+					exitMultiple := getFlagOrPromptFloat(cCtx, "exit-multiple", "Exit Multiple", exitPromptInfo, 16.0)
 
 					fairValue, projectedFCF, err := calc.DCFGrowthExit(
 						currentFCF,
@@ -203,27 +184,9 @@ func main() {
 						return err
 					}
 
-					growthRate := cCtx.Float64("growth-rate")
-					if growthRate == 0.00 {
-						cagr, err := calc.CAGR(data.FCFHistory)
-						if err != nil {
-							return err
-						}
-
-						growthRate = promptFloat("Growth Rate", cagr, growthPromptInfo)
-					}
-
-					currentFCF := cCtx.Int("current-fcf")
-					var recentFCF int
-					if currentFCF == 0 {
-						recentFCF = data.FCFHistory[len(data.FCFHistory)-1]
-						currentFCF = promptInt("Current FCF", recentFCF, fcfPromptInfo)
-					}
-
-					perpetualRate := cCtx.Float64("perpetual-rate")
-					if perpetualRate == 0.00 {
-						perpetualRate = promptFloat("Perpetual Growth Rate", 0.02, perpetualGrowthInfo)
-					}
+					growthRate := getFlagOrPromptFloatWithCAGR(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data)
+					currentFCF := getFlagOrPromptInt(cCtx, "current-fcf", "Current FCF", growthPromptInfo, data.FCFHistory[len(data.FCFHistory)-1])
+					perpetualRate := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, 16.0)
 
 					fairValue, projectedFCF, err := calc.DCFTwoStage(
 						currentFCF,
@@ -292,31 +255,13 @@ func main() {
 						return err
 					}
 
-					growthRate := cCtx.Float64("growth-rate")
-					if growthRate == 0.00 {
-						cagr, err := calc.CAGR(data.CFFDividends)
-						if err != nil {
-							return err
-						}
-
-						growthRate = promptFloat("Growth Rate", cagr, growthPromptInfo)
-					}
-
 					if len(data.CFFDividends) < 1 {
 						return errors.New("no dividend history")
 					}
 
-					currentFCF := cCtx.Int("current-dividends")
-					var recentDividends int
-					if currentFCF == 0 {
-						recentDividends = data.CFFDividends[len(data.CFFDividends)-1]
-						currentFCF = promptInt("Current Cash Paid for Dividends", recentDividends, dividendsPromptInfo)
-					}
-
-					perpetualRate := cCtx.Float64("perpetual-rate")
-					if perpetualRate == 0.00 {
-						perpetualRate = promptFloat("Perpetual Growth Rate", 0.02, perpetualGrowthInfo)
-					}
+					growthRate := getFlagOrPromptFloatWithCAGR(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data)
+					currentFCF := getFlagOrPromptInt(cCtx, "current-fcf", "Current FCF", fcfPromptInfo, data.FCFHistory[len(data.FCFHistory)-1])
+					perpetualRate := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, 16.0)
 
 					fairValue, projectedDividends, err := calc.DDMTwoStage(
 						currentFCF,
@@ -755,6 +700,31 @@ func promptFloat(label string, def float64, info string) float64 {
 	}
 
 	return val
+}
+
+func getFlagOrPromptFloat(cCtx *cli.Context, flagName, prompt, promptInfo string, defaultValue float64) float64 {
+	value := cCtx.Float64(flagName)
+	if value == 0.00 {
+		return promptFloat(prompt, defaultValue, promptInfo)
+	}
+	return value
+}
+
+func getFlagOrPromptFloatWithCAGR(cCtx *cli.Context, flagName, prompt, promptInfo string, data quickfs.Data) float64 {
+	value := cCtx.Float64(flagName)
+	if value == 0.00 {
+		cagr, _ := calc.CAGR(data.FCFHistory)
+		return promptFloat(prompt, cagr, promptInfo)
+	}
+	return value
+}
+
+func getFlagOrPromptInt(cCtx *cli.Context, flagName, prompt, promptInfo string, defaultValue int) int {
+	value := cCtx.Int(flagName)
+	if value == 0 {
+		return promptInt(prompt, defaultValue, promptInfo)
+	}
+	return value
 }
 
 func selectDiscountRateOpt() string {
