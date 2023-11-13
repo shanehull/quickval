@@ -107,7 +107,7 @@ func main() {
 						return err
 					}
 
-					growthRate := getFlagOrPromptFloatWithCAGR(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data)
+					growthRate := getFlagOrPromptGrowthRate(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data.FCFHistory)
 					currentFCF := getFlagOrPromptInt(cCtx, "current-fcf", "Current FCF", fcfPromptInfo, data.FCFHistory[len(data.FCFHistory)-1])
 					exitMultiple := getFlagOrPromptFloat(cCtx, "exit-multiple", "Exit Multiple", exitPromptInfo, 16.0)
 
@@ -184,9 +184,9 @@ func main() {
 						return err
 					}
 
-					growthRate := getFlagOrPromptFloatWithCAGR(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data)
+					growthRate := getFlagOrPromptGrowthRate(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data.FCFHistory)
 					currentFCF := getFlagOrPromptInt(cCtx, "current-fcf", "Current FCF", growthPromptInfo, data.FCFHistory[len(data.FCFHistory)-1])
-					perpetualRate := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, 16.0)
+					perpetualRate := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, 0.02)
 
 					fairValue, projectedFCF, err := calc.DCFTwoStage(
 						currentFCF,
@@ -259,12 +259,12 @@ func main() {
 						return errors.New("no dividend history")
 					}
 
-					growthRate := getFlagOrPromptFloatWithCAGR(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data)
-					currentFCF := getFlagOrPromptInt(cCtx, "current-fcf", "Current FCF", fcfPromptInfo, data.FCFHistory[len(data.FCFHistory)-1])
-					perpetualRate := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, 16.0)
+					growthRate := getFlagOrPromptGrowthRate(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data.CFFDividends)
+					currentDividends := getFlagOrPromptInt(cCtx, "current-dividends", "Current Cash Paid for Dividends", dividendsPromptInfo, data.CFFDividends[len(data.CFFDividends)-1])
+					perpetualRate := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, 0.02)
 
 					fairValue, projectedDividends, err := calc.DDMTwoStage(
-						currentFCF,
+						currentDividends,
 						growthRate,
 						perpetualRate,
 						fyHistory,
@@ -333,13 +333,14 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 			mergedOpts := append(opts,
 				quickfs.WithAPIKey(apiKey),
 				quickfs.WithFYHistory(fyHistory),
-				quickfs.WithBeta(),
 				quickfs.WithDebtToEquity(),
+				quickfs.WithBeta(),
 			)
 
 			qfs := quickfs.NewQuickFS(
 				mergedOpts...,
 			)
+
 			data, err = qfs.GetData(ticker, country)
 			if err != nil {
 				log.Fatalf("error getting data: %s", err)
@@ -362,12 +363,16 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 				riskFreeRate = promptFloat("Risk Free Rate", 0.02, rfrPromptInfo)
 			}
 
-			qfs := quickfs.NewQuickFS(
+			mergedOpts := append(opts,
 				quickfs.WithAPIKey(apiKey),
 				quickfs.WithFYHistory(fyHistory),
-				quickfs.WithFCF(),
 				quickfs.WithDebtToEquity(),
 			)
+
+			qfs := quickfs.NewQuickFS(
+				mergedOpts...,
+			)
+
 			data, err = qfs.GetData(ticker, country)
 			if err != nil {
 				log.Fatalf("error getting data: %s", err)
@@ -386,11 +391,16 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 			writer.Data(&data)
 			writer.WACC(discountRate, equityRiskPremium, riskFreeRate, &data)
 		case "Custom Input":
-			qfs := quickfs.NewQuickFS(
+
+			mergedOpts := append(opts,
 				quickfs.WithAPIKey(apiKey),
 				quickfs.WithFYHistory(fyHistory),
-				quickfs.WithFCF(),
 			)
+
+			qfs := quickfs.NewQuickFS(
+				mergedOpts...,
+			)
+
 			data, err = qfs.GetData(ticker, country)
 			if err != nil {
 				log.Fatalf("error getting data: %s", err)
@@ -710,10 +720,10 @@ func getFlagOrPromptFloat(cCtx *cli.Context, flagName, prompt, promptInfo string
 	return value
 }
 
-func getFlagOrPromptFloatWithCAGR(cCtx *cli.Context, flagName, prompt, promptInfo string, data quickfs.Data) float64 {
+func getFlagOrPromptGrowthRate(cCtx *cli.Context, flagName, prompt, promptInfo string, series []int) float64 {
 	value := cCtx.Float64(flagName)
 	if value == 0.00 {
-		cagr, _ := calc.CAGR(data.FCFHistory)
+		cagr, _ := calc.CAGR(series)
 		return promptFloat(prompt, cagr, promptInfo)
 	}
 	return value
