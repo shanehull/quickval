@@ -72,7 +72,7 @@ func main() {
 			{
 				Name:        "growth-exit",
 				Aliases:     []string{"dcf", "dcfe"},
-				Description: "a growth-exit model with a high-growth stage and an exit mulitple",
+				Description: "a growth-exit model with a high-growth stage and an exit multiple",
 				Flags: []cli.Flag{
 					&cli.Float64Flag{
 						Name:  "risk-free",
