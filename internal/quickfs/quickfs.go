@@ -219,7 +219,7 @@ func (q *quickFS) formatOptionalQFS(field *string, ticker, country string, condi
 	if condition {
 		*field = fmt.Sprintf("QFS(%s:%s,%s", ticker, country, metric)
 		if len(args) > 0 {
-			*field += fmt.Sprintf(",%s)", fmt.Sprintf(args[0].(string), args[1:]...))
+			*field += fmt.Sprintf(",%s)", fmt.Sprintf(args[0].(string)))
 		} else {
 			*field += ")"
 		}

@@ -9,7 +9,7 @@
 `quickval` is an interactive CLI tool that leverages the free [QuickFS.net API](https://quickfs.net/features/public-api) to step through security valuations.
 
 <p align="center">
-    <img src="docs/images/quickval.gif" width="700" alt="quickval cmd line example">
+    <img src="docs/images/quickval.gif" width="800" alt="quickval cmd line example">
 </p>
 
 ### Supported Valuation Models:

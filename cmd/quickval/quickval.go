@@ -283,7 +283,7 @@ func main() {
 			},
 		},
 		Before: func(cCtx *cli.Context) error {
-			if cCtx.NumFlags() > 0 && cCtx.NArg() == 0 {
+			if cCtx.NArg() == 0 {
 				err := cli.ShowAppHelp(cCtx)
 				if err != nil {
 					return err
