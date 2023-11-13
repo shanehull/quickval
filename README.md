@@ -60,7 +60,7 @@ USAGE:
    quickval growth-exit [command options] [arguments...]
 
 DESCRIPTION:
-   a growth-exit model with a high-growth stage and an exit mulitple
+   a growth-exit model with a high-growth stage and an exit multiple
 
 OPTIONS:
    --risk-free value     the risk free rate in decimal format (default: 0)
