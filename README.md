@@ -85,8 +85,15 @@ It is calculated like so:
 
 $$CV = (a / X) * 100$$
 
-$$Where \ a = \ Standard \ Deviation$$
-$$and$$
-$$ X = \ Mean$$
+$$
+Where \ a = \ Standard \ Deviation
+\\
+and
+\\
+X = \ Mean
+$$
 
 More studies to come on this concept in the future...
+
+$$
+$$
