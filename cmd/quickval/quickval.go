@@ -35,7 +35,7 @@ var (
 )
 
 var (
-	rfrPromptInfo       = "Enter a risk-free rate (e.g a 10-year average of a 10-year treasury bond yield)."
+	rfrPromptInfo       = "Enter a Risk-Rree Rate (e.g a 10-year average of a 10-year treasury bond yield)."
 	erpPromptInfo       = "Enter an ERP (Equity Risk Premium)."
 	discPromptInfo      = "Enter an explicit discount rate."
 	growthPromptInfo    = "Enter a reasonable growth rate, or accept the default (derived from a CAGR of the FCF or dividend history)."
@@ -76,7 +76,7 @@ func main() {
 					&cli.Float64Flag{
 						Name:  "risk-free",
 						Value: 0.00,
-						Usage: "the risk free rate in decimal format",
+						Usage: "the risk-free rate in decimal format",
 					},
 					&cli.Float64Flag{
 						Name:  "risk-premium",
@@ -327,7 +327,7 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 
 			riskFreeRate = cCtx.Float64("risk-free")
 			if riskFreeRate == 0.0 {
-				riskFreeRate = promptFloat("Risk Free Rate", 0.02, rfrPromptInfo)
+				riskFreeRate = promptFloat("Risk-Free Rate", 0.02, rfrPromptInfo)
 			}
 
 			mergedOpts := append(opts,
@@ -691,7 +691,7 @@ func promptFloat(label string, def float64, info string) float64 {
 		Label:     label,
 		Validate:  validate,
 		AllowEdit: true,
-		Default:   string(sDef),
+		Default:   sDef,
 	}
 
 	if info != "" {
