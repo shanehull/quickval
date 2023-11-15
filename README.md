@@ -28,7 +28,7 @@ If you're looking to determine the true value of a company, well that's just not
 
 You can simply run `quickval` with no arguments to get started, however, to avoid being prompted for certain inputs, you can add arguments to the global command, e.g:
 
-```bash
+```
 NAME:
    quickval - Perform quick valuations using QuickFS API
 
@@ -52,7 +52,7 @@ Subcommands require some unique inputs and will prompt you if not supplied via C
 
 E.g; the growth-exit model takes the following args, but will prompt and suggest defaults (e.g. a CAGR for the growth rate) that may or may not need to be tweaked, depending on your requirements:
 
-```bash
+```
 NAME:
    quickval growth-exit
 
@@ -63,7 +63,7 @@ DESCRIPTION:
    a growth-exit model with a high-growth stage and an exit multiple
 
 OPTIONS:
-   --risk-free value     the risk free rate in decimal format (default: 0)
+   --risk-free value     the risk-free rate in decimal format (default: 0)
    --risk-premium value  the equity risk premium rate in decimal format (default: 0)
    --current-fcf value   override the current FCF with a normalized number (default: 0)
    --growth-rate value   override the growth rate with your own number (default: 0)
