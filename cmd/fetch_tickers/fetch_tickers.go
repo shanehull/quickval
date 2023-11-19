@@ -15,10 +15,6 @@ var (
 	_apiKey string
 )
 
-var (
-	countryCodes = []string{"US", "AT", "AU", "BE", "CA", "CH", "DE", "DK", "ES", "FI", "FI", "FR", "GR", "IT", "LN", "MM", "NL", "NO", "NZ", "PL", "SE"}
-)
-
 func init() {
 	flag.StringVar(&_apiKey, "api-key", "", "quickfs api key")
 }
@@ -28,7 +24,7 @@ func main() {
 
 	qfs := quickfs.NewQuickFS(quickfs.WithAPIKey(_apiKey))
 
-	for _, code := range countryCodes {
+	for _, code := range quickfs.CountryCodes {
 		start := time.Now()
 		comp, err := qfs.GetCompanies(code)
 		if err != nil {
