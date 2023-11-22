@@ -48,7 +48,7 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 
 			riskFreeRate = cCtx.Float64("risk-free")
 			if riskFreeRate == 0.0 {
-				riskFreeRate = promptFloat("Risk-Free Rate", 0.02, rfrPromptInfo)
+				riskFreeRate = promptFloat("Risk-Free Rate", 0.042, rfrPromptInfo)
 			}
 
 			mergedOpts := append(opts,
@@ -148,8 +148,9 @@ func fetchTickers(country string) ([]string, error) {
 	// try to load from local cache first
 	data, err := os.ReadFile(cacheFilePath)
 	if err == nil {
+		// data was successfully loaded from cache
 		if err := json.Unmarshal(data, &searchTickers); err == nil {
-			// data successfully loaded from local cache
+			// ignore errors
 
 			// refresh local cache in the background
 			go func() {
@@ -164,7 +165,8 @@ func fetchTickers(country string) ([]string, error) {
 	// if no local cache, get them from the repo - quickfs is too slow
 	searchTickers, err := fetchTickersFromGH(country)
 	if err != nil {
-		return nil, err
+		// we should never get here, but if we do, it should throw an error
+		return nil, errors.New("error retrieving tickers")
 	}
 
 	// refresh local cache in the background
@@ -280,6 +282,9 @@ func setCommonVars(cCtx *cli.Context) error {
 }
 
 func promptKey() string {
+	fmt.Println()
+	fmt.Println("Enter a valid API key for QuickFS.")
+
 	validate := func(input string) error {
 		r, _ := regexp.Compile("^[a-z0-9]{40}$")
 
@@ -297,9 +302,6 @@ func promptKey() string {
 		// HideEntered: true,
 	}
 
-	fmt.Println()
-	fmt.Println("Enter a valid API key for QuickFS.")
-
 	response, err := s.Run()
 
 	if err != nil {
@@ -309,6 +311,9 @@ func promptKey() string {
 }
 
 func selectTicker(country string, apiKey string) string {
+	fmt.Println()
+	fmt.Println("Start typing to find your ticker.")
+
 	tickers, err := fetchTickers(country)
 	if err != nil {
 		log.Fatalf("an error occurred when fetching ticker: %s", err)
@@ -319,9 +324,6 @@ func selectTicker(country string, apiKey string) string {
 		input = strings.Replace(strings.ToLower(input), " ", "", -1)
 		return strings.Contains(ticker, input)
 	}
-
-	fmt.Println()
-	fmt.Println("Start typing to find your ticker.")
 
 	s := promptui.Select{
 		Label:             "Ticker",
@@ -339,6 +341,9 @@ func selectTicker(country string, apiKey string) string {
 }
 
 func selectCountry() string {
+	fmt.Println()
+	fmt.Println("Select the country that your ticker trades in.")
+
 	searcher := func(input string, index int) bool {
 		ticker := strings.ToLower(quickfs.CountryCodes[index])
 		input = strings.Replace(strings.ToLower(input), " ", "", -1)
@@ -352,9 +357,6 @@ func selectCountry() string {
 		StartInSearchMode: true,
 	}
 
-	fmt.Println()
-	fmt.Println("Select the country that your ticker trades in.")
-
 	_, response, err := s.Run()
 	if err != nil {
 		log.Fatalf("an error occurred when setting the country: %s", err)
@@ -364,6 +366,12 @@ func selectCountry() string {
 }
 
 func promptInt(label string, def int, info string) int {
+
+	if info != "" {
+		fmt.Println()
+		fmt.Println(info)
+	}
+
 	validate := func(input string) error {
 		_, err := strconv.ParseInt(input, 10, 64)
 		if err != nil {
@@ -377,11 +385,6 @@ func promptInt(label string, def int, info string) int {
 		Validate:  validate,
 		AllowEdit: true,
 		Default:   fmt.Sprint(def),
-	}
-
-	if info != "" {
-		fmt.Println()
-		fmt.Println(info)
 	}
 
 	response, err := s.Run()
@@ -398,6 +401,11 @@ func promptInt(label string, def int, info string) int {
 }
 
 func promptFloat(label string, def float64, info string) float64 {
+	if info != "" {
+		fmt.Println()
+		fmt.Println(info)
+	}
+
 	validate := func(input string) error {
 		_, err := strconv.ParseFloat(input, 64)
 		if err != nil {
@@ -415,11 +423,6 @@ func promptFloat(label string, def float64, info string) float64 {
 		Default:   sDef,
 	}
 
-	if info != "" {
-		fmt.Println()
-		fmt.Println(info)
-	}
-
 	response, err := s.Run()
 	if err != nil {
 		log.Fatalf("an error occurred when setting %s: %s", label, err)
@@ -432,7 +435,6 @@ func promptFloat(label string, def float64, info string) float64 {
 
 	return val
 }
-
 func getFlagOrPromptFloat(cCtx *cli.Context, flagName, prompt, promptInfo string, defaultValue float64) float64 {
 	value := cCtx.Float64(flagName)
 	if value == 0.00 {
