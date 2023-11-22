@@ -296,10 +296,10 @@ func promptKey() string {
 	}
 
 	s := promptui.Prompt{
-		Label:    "API Key",
-		Validate: validate,
-		Mask:     '*',
-		// HideEntered: true,
+		Label:       "API Key",
+		Validate:    validate,
+		Mask:        '*',
+		HideEntered: true,
 	}
 
 	response, err := s.Run()
@@ -366,7 +366,6 @@ func selectCountry() string {
 }
 
 func promptInt(label string, def int, info string) int {
-
 	if info != "" {
 		fmt.Println()
 		fmt.Println(info)
@@ -461,13 +460,13 @@ func getFlagOrPromptInt(cCtx *cli.Context, flagName, prompt, promptInfo string, 
 }
 
 func selectDiscountRateOpt() string {
+	fmt.Println()
+	fmt.Println("There are a few options for calculating a discount rate. Choose which one you would like to use.")
+
 	s := promptui.Select{
 		Label: "Discount Rate Options",
 		Items: []string{"WACC", "CV Weighted WACC", "Custom Input"},
 	}
-
-	fmt.Println()
-	fmt.Println("There are a few options for calculating a discount rate. Choose which one you would like to use.")
 
 	_, response, err := s.Run()
 	if err != nil {
