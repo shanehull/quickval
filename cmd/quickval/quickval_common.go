@@ -286,6 +286,10 @@ func promptKey() string {
 	fmt.Println("Enter a valid API key for QuickFS.")
 
 	validate := func(input string) error {
+		if input == "" {
+			return errors.New("input cannot be empty")
+		}
+
 		r, _ := regexp.Compile("^[a-z0-9]{40}$")
 
 		m := r.MatchString(input)
@@ -303,10 +307,10 @@ func promptKey() string {
 	}
 
 	response, err := s.Run()
-
 	if err != nil {
 		log.Fatalf("an error occurred when setting the api key: %s", err)
 	}
+
 	return response
 }
 
@@ -366,16 +370,25 @@ func selectCountry() string {
 }
 
 func promptInt(label string, def int, info string) int {
+	var val int
+
 	if info != "" {
 		fmt.Println()
 		fmt.Println(info)
 	}
 
 	validate := func(input string) error {
-		_, err := strconv.ParseInt(input, 10, 64)
-		if err != nil {
-			return err
+		if input == "" {
+			return errors.New("input cannot be empty")
 		}
+
+		parsedInput, err := strconv.ParseInt(input, 10, 0)
+		if err != nil {
+			return errors.New("please enter a valid int number")
+		}
+
+		val = int(parsedInput)
+
 		return nil
 	}
 
@@ -386,30 +399,34 @@ func promptInt(label string, def int, info string) int {
 		Default:   fmt.Sprint(def),
 	}
 
-	response, err := s.Run()
+	_, err := s.Run()
 	if err != nil {
 		log.Fatalf("an error occurred when setting %s: %s", label, err)
 	}
 
-	val, err := strconv.ParseInt(response, 10, 0)
-	if err != nil {
-		log.Fatalf("an error occurred when setting %s: %s", label, err)
-	}
-
-	return int(val)
+	return val
 }
 
 func promptFloat(label string, def float64, info string) float64 {
+	var val float64
+
 	if info != "" {
 		fmt.Println()
 		fmt.Println(info)
 	}
 
 	validate := func(input string) error {
-		_, err := strconv.ParseFloat(input, 64)
-		if err != nil {
-			return err
+		if input == "" {
+			return errors.New("input cannot be empty")
 		}
+
+		parsedInput, err := strconv.ParseFloat(input, 64)
+		if err != nil {
+			return errors.New("please enter a valid float number")
+		}
+
+		val = parsedInput
+
 		return nil
 	}
 
@@ -422,18 +439,14 @@ func promptFloat(label string, def float64, info string) float64 {
 		Default:   sDef,
 	}
 
-	response, err := s.Run()
-	if err != nil {
-		log.Fatalf("an error occurred when setting %s: %s", label, err)
-	}
-
-	val, err := strconv.ParseFloat(response, 64)
+	_, err := s.Run()
 	if err != nil {
 		log.Fatalf("an error occurred when setting %s: %s", label, err)
 	}
 
 	return val
 }
+
 func getFlagOrPromptFloat(cCtx *cli.Context, flagName, prompt, promptInfo string, defaultValue float64) float64 {
 	value := cCtx.Float64(flagName)
 	if value == 0.00 {
