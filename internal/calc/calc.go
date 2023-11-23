@@ -250,17 +250,21 @@ func CAGR(values []int) (float64, error) {
 
 	var cagr float64
 
+	initialValueAbs := math.Abs(initialValue)
+	finalValueAbs := math.Abs(finalValue)
+	pow := 1.0 / numYears
+
 	switch {
-	case initialValue > 0 && finalValue >= 0:
-		cagr = math.Pow(finalValue/initialValue, 1.0/numYears) - 1
-	case initialValue < 0 && finalValue <= 0:
-		cagr = -1 * (math.Pow(math.Abs(finalValue)/math.Abs(initialValue), 1.0/numYears) - 1)
-	case initialValue < 0 && finalValue > 0:
-		cagr = math.Pow((finalValue+2*math.Abs(initialValue))/math.Abs(initialValue), 1.0/numYears) - 1
-	case initialValue > 0 && finalValue < 0:
-		cagr = -1 * (math.Pow((math.Abs(finalValue)+2*initialValue)/initialValue, 1.0/numYears) - 1)
-	default:
+	case initialValue == 0 || finalValue == 0:
 		cagr = 0
+	case initialValue > 0 && finalValue >= 0:
+		cagr = math.Pow(finalValue/initialValue, pow) - 1
+	case initialValue < 0 && finalValue <= 0:
+		cagr = -1 * (math.Pow(finalValueAbs/initialValueAbs, pow) - 1)
+	case initialValue < 0 && finalValue > 0:
+		cagr = math.Pow((finalValueAbs+2*initialValueAbs)/initialValueAbs, pow) - 1
+	case initialValue > 0 && finalValue < 0:
+		cagr = -1 * (math.Pow(finalValueAbs+2*initialValue, pow)/initialValue - 1)
 	}
 
 	return cagr, nil
