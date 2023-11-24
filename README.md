@@ -3,8 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Report](https://goreportcard.com/badge/github.com/shanehull/quickval)](https://goreportcard.com/report/github.com/shanehull/quickval)
 
-[![Lint Workflow](https://github.com/shanehull/quickval/actions/workflows/lint.yaml/badge.svg?branch=release)](https://github.com/shanehull/quickval/actions/workflows/lint.yaml/badge.svg?branch=release)
-[![Release Workflow](https://github.com/shanehull/quickval/actions/workflows/release.yaml/badge.svg?branch=release)](https://github.com/shanehull/quickval/actions/workflows/release.yaml/badge.svg?branch=release)
+[![Test Workflow](https://github.com/shanehull/quickval/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/shanehull/quickval/actions/workflows/test.yaml/badge.svg?branch=main)
+[![Lint Workflow](https://github.com/shanehull/quickval/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/shanehull/quickval/actions/workflows/lint.yaml/badge.svg?branch=main)
+[![Release Workflow](https://github.com/shanehull/quickval/actions/workflows/release.yaml/badge.svg?branch=main)](https://github.com/shanehull/quickval/actions/workflows/release.yaml/badge.svg?branch=main)
 
 `quickval` is an interactive CLI tool that leverages the free [QuickFS.net API](https://quickfs.net/features/public-api) to step through security valuations.
 
