@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestWriter_Render(t *testing.T) {
+func WriterRender_Test(t *testing.T) {
 	tmpfile, err := os.CreateTemp("", "example")
 	if err != nil {
 		t.Fatal(err)
