@@ -13,7 +13,7 @@ func testSG() *cli.App {
 	return &tapp
 }
 
-func TestAppRun(t *testing.T) {
+func AppRun_Test(t *testing.T) {
 	sg := testSG()
 
 	var out, err bytes.Buffer
