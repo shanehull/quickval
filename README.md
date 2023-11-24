@@ -5,7 +5,7 @@
 
 [![Test Workflow](https://github.com/shanehull/quickval/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/shanehull/quickval/actions/workflows/test.yaml/badge.svg?branch=main)
 [![Lint Workflow](https://github.com/shanehull/quickval/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/shanehull/quickval/actions/workflows/lint.yaml/badge.svg?branch=main)
-[![Release Workflow](https://github.com/shanehull/quickval/actions/workflows/release.yaml/badge.svg?branch=main)](https://github.com/shanehull/quickval/actions/workflows/release.yaml/badge.svg?branch=main)
+[![Release Workflow](https://github.com/shanehull/quickval/actions/workflows/release.yaml/badge.svg?branch=release)](https://github.com/shanehull/quickval/actions/workflows/release.yaml/badge.svg?branch=release)
 
 `quickval` is an interactive CLI tool that leverages the free [QuickFS.net API](https://quickfs.net/features/public-api) to step through security valuations.
 
