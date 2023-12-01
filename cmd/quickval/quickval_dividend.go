@@ -65,7 +65,7 @@ var dividendDiscountCommand = &cli.Command{
 
 		growthRate := getFlagOrPromptGrowthRate(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data.CFFDividends)
 		currentDividends := getFlagOrPromptInt(cCtx, "current-dividends", "Current Cash Paid for Dividends", dividendsPromptInfo, data.CFFDividends[len(data.CFFDividends)-1])
-		perpetualRate := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, 0.02)
+		perpetualRate := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, defaultPerpetualRate)
 
 		fairValue, projectedDividends, err := calc.DDMTwoStage(
 			currentDividends,

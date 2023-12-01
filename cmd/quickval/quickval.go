@@ -34,6 +34,13 @@ var (
 	fyHistoryPromptInfo = "Enter a FY history to retrieve for financial reports."
 )
 
+var (
+	defaultRFR           = 0.042
+	defaultPerpetualRate = 0.02
+	defaultExitMultiple  = 16.0
+	defaultERP           = 0.05
+)
+
 var bashCompletionsMode bool
 
 func main() {

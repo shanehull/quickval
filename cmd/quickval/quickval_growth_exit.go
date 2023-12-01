@@ -50,7 +50,7 @@ var growthExitCommand = &cli.Command{
 
 		growthRate := getFlagOrPromptGrowthRate(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data.FCFHistory)
 		currentFCF := getFlagOrPromptInt(cCtx, "current-fcf", "Current FCF", fcfPromptInfo, data.FCFHistory[len(data.FCFHistory)-1])
-		exitMultiple := getFlagOrPromptFloat(cCtx, "exit-multiple", "Exit Multiple", exitPromptInfo, 16.0)
+		exitMultiple := getFlagOrPromptFloat(cCtx, "exit-multiple", "Exit Multiple", exitPromptInfo, defaultExitMultiple)
 
 		fairValue, projectedFCF, err := calc.DCFGrowthExit(
 			currentFCF,

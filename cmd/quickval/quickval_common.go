@@ -43,12 +43,12 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 		case "WACC":
 			equityRiskPremium = cCtx.Float64("risk-premium")
 			if equityRiskPremium == 0.0 {
-				equityRiskPremium = promptFloat("Equity Risk Premium", 0.05, erpPromptInfo)
+				equityRiskPremium = promptFloat("Equity Risk Premium", defaultERP, erpPromptInfo)
 			}
 
 			riskFreeRate = cCtx.Float64("risk-free")
 			if riskFreeRate == 0.0 {
-				riskFreeRate = promptFloat("Risk-Free Rate", 0.042, rfrPromptInfo)
+				riskFreeRate = promptFloat("Risk-Free Rate", defaultRFR, rfrPromptInfo)
 			}
 
 			mergedOpts := append(opts,
@@ -81,7 +81,7 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 
 			riskFreeRate = cCtx.Float64("risk-free")
 			if riskFreeRate == 0.0 {
-				riskFreeRate = promptFloat("Risk Free Rate", 0.042, rfrPromptInfo)
+				riskFreeRate = promptFloat("Risk Free Rate", defaultRFR, rfrPromptInfo)
 			}
 
 			mergedOpts := append(opts,
