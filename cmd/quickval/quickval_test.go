@@ -8,13 +8,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func testSG() *cli.App {
+func testApp() *cli.App {
 	tapp := *app
 	return &tapp
 }
 
 func AppRun_Test(t *testing.T) {
-	sg := testSG()
+	sg := testApp()
 
 	var out, err bytes.Buffer
 	sg.Writer = &out
