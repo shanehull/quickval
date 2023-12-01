@@ -81,7 +81,7 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 
 			riskFreeRate = cCtx.Float64("risk-free")
 			if riskFreeRate == 0.0 {
-				riskFreeRate = promptFloat("Risk Free Rate", 0.02, rfrPromptInfo)
+				riskFreeRate = promptFloat("Risk Free Rate", 0.042, rfrPromptInfo)
 			}
 
 			mergedOpts := append(opts,
