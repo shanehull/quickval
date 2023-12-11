@@ -63,9 +63,18 @@ var dividendDiscountCommand = &cli.Command{
 			return errors.New("no dividend history")
 		}
 
-		growthRate := getFlagOrPromptGrowthRate(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data.CFFDividends)
-		currentDividends := getFlagOrPromptInt(cCtx, "current-dividends", "Current Cash Paid for Dividends", dividendsPromptInfo, data.CFFDividends[len(data.CFFDividends)-1])
-		perpetualRate := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, defaultPerpetualRate)
+		growthRate, err := getFlagOrPromptGrowthRate(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data.CFFDividends)
+		if err != nil {
+			return err
+		}
+		currentDividends, err := getFlagOrPromptInt(cCtx, "current-dividends", "Current Cash Paid for Dividends", dividendsPromptInfo, data.CFFDividends[len(data.CFFDividends)-1])
+		if err != nil {
+			return err
+		}
+		perpetualRate, err := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, defaultPerpetualRate)
+		if err != nil {
+			return err
+		}
 
 		fairValue, projectedDividends, err := calc.DDMTwoStage(
 			currentDividends,

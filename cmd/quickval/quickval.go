@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"errors"
-	"log"
+	"fmt"
 	"os"
 	"time"
 
@@ -49,7 +49,8 @@ func main() {
 	}
 
 	if err := app.RunContext(context.Background(), os.Args); err != nil {
-		log.Fatal(err)
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 }
 

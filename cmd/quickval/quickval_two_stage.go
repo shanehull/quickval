@@ -63,9 +63,18 @@ var twoStageCommand = &cli.Command{
 			return err
 		}
 
-		growthRate := getFlagOrPromptGrowthRate(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data.FCFHistory)
-		currentFCF := getFlagOrPromptInt(cCtx, "current-fcf", "Current FCF", growthPromptInfo, data.FCFHistory[len(data.FCFHistory)-1])
-		perpetualRate := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, defaultPerpetualRate)
+		growthRate, err := getFlagOrPromptGrowthRate(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data.FCFHistory)
+		if err != nil {
+			return err
+		}
+		currentFCF, err := getFlagOrPromptInt(cCtx, "current-fcf", "Current FCF", growthPromptInfo, data.FCFHistory[len(data.FCFHistory)-1])
+		if err != nil {
+			return err
+		}
+		perpetualRate, err := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, defaultPerpetualRate)
+		if err != nil {
+			return err
+		}
 
 		fairValue, projectedFCF, err := calc.DCFTwoStage(
 			currentFCF,

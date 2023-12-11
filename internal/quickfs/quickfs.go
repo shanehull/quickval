@@ -7,8 +7,6 @@ import (
 	"io"
 	"net/http"
 	"strings"
-
-	"github.com/rs/zerolog/log"
 )
 
 var CountryCodes = []string{"US", "AT", "AU", "BE", "CA", "CH", "DE", "DK", "ES", "FI", "FI", "FR", "GR", "IT", "LN", "MM", "NL", "NO", "NZ", "PL", "SE"}
@@ -124,7 +122,6 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 
 	jsonPayload, err := json.Marshal(pl)
 	if err != nil {
-		log.Error().Err(err).Msg("error marshaling quickfs payload")
 		return data, err
 	}
 
