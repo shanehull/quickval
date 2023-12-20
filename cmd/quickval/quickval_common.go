@@ -358,7 +358,7 @@ func selectTicker(country string, apiKey string) (string, error) {
 	searcher := func(input string, index int) bool {
 		ticker := strings.ToLower(tickers[index])
 		input = strings.Replace(strings.ToLower(input), " ", "", -1)
-		return strings.Contains(ticker, input)
+		return strings.HasPrefix(ticker, input)
 	}
 
 	s := promptui.Select{
