@@ -2287,5 +2287,14 @@
    "CORD:LN",
    "SKA:LN",
    "NXQ:LN",
-   "MCG:LN"
+   "MCG:LN",
+   "TPV:LN",
+   "ACRM:LN",
+   "SSIT:LN",
+   "GMET:LN",
+   "SCSP:LN",
+   "ECOB:LN",
+   "GSC:LN",
+   "FIXP:LN",
+   "FWT:LN"
 ]

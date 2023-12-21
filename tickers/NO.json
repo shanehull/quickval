@@ -347,5 +347,7 @@
    "BWO:NO",
    "BWE:NO",
    "SPOT:NO",
-   "TRMED:NO"
+   "TRMED:NO",
+   "ASTRO:NO",
+   "OMDA:NO"
 ]
