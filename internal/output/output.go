@@ -42,7 +42,6 @@ func (w *Writer) Data(data *quickfs.Data) {
 	}
 
 	w.table.Append([]string{"", ""})
-
 }
 
 func (w *Writer) WACC(rate float64, erp float64, rfr float64, data *quickfs.Data) {
@@ -66,11 +65,12 @@ func (w *Writer) WACC(rate float64, erp float64, rfr float64, data *quickfs.Data
 	w.table.Append([]string{"", ""})
 }
 
-func (w *Writer) Projected(projected []int, growthRate float64) {
+func (w *Writer) Projected(projected []int, growthRate float64, expectedReturn float64) {
 	w.table.Append([]string{"", ""})
 	w.table.Append([]string{"PROJECTIONS", ""})
 	w.table.Append([]string{"----------------------------------------", "------------------"})
 	w.table.Append([]string{"Growth Rate", fmt.Sprintf("%.2f", growthRate)})
+	w.table.Append([]string{"Expected Return", fmt.Sprintf("%.2f", expectedReturn)})
 	w.table.Append([]string{"", ""})
 
 	// append projections

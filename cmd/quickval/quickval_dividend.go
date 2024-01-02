@@ -54,7 +54,11 @@ var dividendDiscountCommand = &cli.Command{
 	Action: func(cCtx *cli.Context) error {
 		writer := output.NewWriter(os.Stdout)
 
-		data, fyHistory, discountRate, err := doCommonSetup(cCtx, writer, quickfs.WithCFFDividends())
+		data, fyHistory, discountRate, err := doCommonSetup(
+			cCtx,
+			writer,
+			quickfs.WithCFFDividends(),
+		)
 		if err != nil {
 			return err
 		}
@@ -63,9 +67,45 @@ var dividendDiscountCommand = &cli.Command{
 			return errors.New("no dividend history")
 		}
 
-		growthRate := getFlagOrPromptGrowthRate(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data.CFFDividends)
-		currentDividends := getFlagOrPromptInt(cCtx, "current-dividends", "Current Cash Paid for Dividends", dividendsPromptInfo, data.CFFDividends[len(data.CFFDividends)-1])
-		perpetualRate := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, 0.02)
+		growthRate, err := getFlagOrPromptGrowthRate(
+			cCtx,
+			"growth-rate",
+			"Growth Rate",
+			growthPromptInfo,
+			data.CFFDividends,
+		)
+		if err != nil {
+			return err
+		}
+		currentDividends, err := getFlagOrPromptInt(
+			cCtx,
+			"current-dividends",
+			"Current Cash Paid for Dividends",
+			dividendsPromptInfo,
+			data.CFFDividends[len(data.CFFDividends)-1],
+		)
+		if err != nil {
+			return err
+		}
+		perpetualRate, err := getFlagOrPromptFloat(
+			cCtx,
+			"perpetual-rate",
+			"Perpetual Growth Rate",
+			perpetualGrowthInfo,
+			defaultPerpetualRate,
+		)
+		if err != nil {
+			return err
+		}
+
+		expectedReturn, err := calc.ExpectedReturn(
+			growthRate,
+			float64(currentDividends)/float64(data.Shares),
+			data.Price,
+		)
+		if err != nil {
+			return err
+		}
 
 		fairValue, projectedDividends, err := calc.DDMTwoStage(
 			currentDividends,
@@ -79,7 +119,7 @@ var dividendDiscountCommand = &cli.Command{
 			return err
 		}
 
-		writer.Projected(projectedDividends, growthRate)
+		writer.Projected(projectedDividends, growthRate, expectedReturn)
 		writer.FairValue(fairValue)
 		writer.Render()
 		return nil

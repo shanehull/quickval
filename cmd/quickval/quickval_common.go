@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -21,7 +20,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.ConfigOption) (quickfs.Data, int, float64, error) {
+func doCommonSetup(
+	cCtx *cli.Context,
+	writer *output.Writer,
+	opts ...quickfs.ConfigOption,
+) (quickfs.Data, int, float64, error) {
 	var (
 		data              quickfs.Data
 		equityRiskPremium float64
@@ -31,7 +34,10 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 
 	fyHistory := cCtx.Int("fy-history")
 	if fyHistory == 0 {
-		fyHistory = promptInt("FY History", 5, fyHistoryPromptInfo)
+		fyHistory, err = promptInt("FY History", 5, fyHistoryPromptInfo)
+		if err != nil {
+			return data, fyHistory, equityRiskPremium, err
+		}
 	}
 
 	discountRate := cCtx.Float64("discount-rate")
@@ -43,12 +49,22 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 		case "WACC":
 			equityRiskPremium = cCtx.Float64("risk-premium")
 			if equityRiskPremium == 0.0 {
-				equityRiskPremium = promptFloat("Equity Risk Premium", 0.05, erpPromptInfo)
+				equityRiskPremium, err = promptFloat(
+					"Equity Risk Premium",
+					defaultERP,
+					erpPromptInfo,
+				)
+				if err != nil {
+					return data, fyHistory, discountRate, err
+				}
 			}
 
 			riskFreeRate = cCtx.Float64("risk-free")
 			if riskFreeRate == 0.0 {
-				riskFreeRate = promptFloat("Risk-Free Rate", 0.042, rfrPromptInfo)
+				riskFreeRate, err = promptFloat("Risk-Free Rate", defaultRFR, rfrPromptInfo)
+				if err != nil {
+					return data, fyHistory, discountRate, err
+				}
 			}
 
 			mergedOpts := append(opts,
@@ -64,10 +80,16 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 
 			data, err = qfs.GetData(ticker, country)
 			if err != nil {
-				log.Fatalf("error getting data: %s", err)
+				return data, fyHistory, discountRate, fmt.Errorf("error getting data: %s", err)
 			}
 
-			wacc := calc.WACC(data.Beta, data.DebtToEquity, data.TaxRate, equityRiskPremium, riskFreeRate)
+			wacc := calc.WACC(
+				data.Beta,
+				data.DebtToEquity,
+				data.TaxRate,
+				equityRiskPremium,
+				riskFreeRate,
+			)
 
 			discountRate = wacc
 
@@ -76,12 +98,18 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 		case "CV Weighted WACC":
 			equityRiskPremium = cCtx.Float64("risk-premium")
 			if equityRiskPremium == 0.0 {
-				equityRiskPremium = promptFloat("Equity Risk Premium", 0.05, erpPromptInfo)
+				equityRiskPremium, err = promptFloat("Equity Risk Premium", 0.05, erpPromptInfo)
+				if err != nil {
+					return data, fyHistory, discountRate, err
+				}
 			}
 
 			riskFreeRate = cCtx.Float64("risk-free")
 			if riskFreeRate == 0.0 {
-				riskFreeRate = promptFloat("Risk Free Rate", 0.042, rfrPromptInfo)
+				riskFreeRate, err = promptFloat("Risk Free Rate", defaultRFR, rfrPromptInfo)
+				if err != nil {
+					return data, fyHistory, discountRate, err
+				}
 			}
 
 			mergedOpts := append(opts,
@@ -96,7 +124,7 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 
 			data, err = qfs.GetData(ticker, country)
 			if err != nil {
-				log.Fatalf("error getting data: %s", err)
+				return data, 0, 0, fmt.Errorf("error getting data: %s", err)
 			}
 
 			wacc := calc.FCFCVWeightedWACC(
@@ -112,7 +140,6 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 			writer.Data(&data)
 			writer.WACC(discountRate, equityRiskPremium, riskFreeRate, &data)
 		case "Custom Input":
-
 			mergedOpts := append(opts,
 				quickfs.WithAPIKey(apiKey),
 				quickfs.WithFYHistory(fyHistory),
@@ -124,10 +151,13 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 
 			data, err = qfs.GetData(ticker, country)
 			if err != nil {
-				log.Fatalf("error getting data: %s", err)
+				return data, 0, 0, fmt.Errorf("error getting data: %s", err)
 			}
 
-			discountRate = promptFloat("Discount Rate", 0.06, discPromptInfo)
+			discountRate, err = promptFloat("Discount Rate", 0.06, discPromptInfo)
+			if err != nil {
+				return data, 0, 0, err
+			}
 
 			writer.Data(&data)
 			writer.DiscountRate(discountRate)
@@ -155,7 +185,8 @@ func fetchTickers(country string) ([]string, error) {
 			// refresh local cache in the background
 			go func() {
 				if err := updateLocalCache(country, cacheFilePath); err != nil {
-					log.Printf("failed to update local cache: %s", err)
+					fmt.Printf("failed to update local cache: %s", err)
+					return
 				}
 			}()
 			return searchTickers, nil
@@ -172,7 +203,8 @@ func fetchTickers(country string) ([]string, error) {
 	// refresh local cache in the background
 	go func() {
 		if err := updateLocalCache(country, cacheFilePath); err != nil {
-			log.Printf("failed to update local cache: %s", err)
+			fmt.Printf("failed to update local cache: %s", err)
+			return
 		}
 	}()
 
@@ -215,7 +247,7 @@ func updateLocalCache(country, cacheFilePath string) error {
 	qfs := quickfs.NewQuickFS(quickfs.WithAPIKey(apiKey))
 	availTickers, err := qfs.GetCompanies(country)
 	if err != nil {
-		log.Fatalf("an error occurred when requesting tickers list: %s", err)
+		return fmt.Errorf("an error occurred when requesting tickers list: %s", err)
 	}
 
 	for _, t := range availTickers {
@@ -228,7 +260,7 @@ func updateLocalCache(country, cacheFilePath string) error {
 		return err
 	}
 
-	return atomicWrite(cacheFilePath, data, 0755)
+	return atomicWrite(cacheFilePath, data, 0o755)
 }
 
 func atomicWrite(filename string, data []byte, perms fs.FileMode) error {
@@ -254,6 +286,7 @@ func atomicWrite(filename string, data []byte, perms fs.FileMode) error {
 }
 
 func setCommonVars(cCtx *cli.Context) error {
+	var err error
 	envVal, ok := os.LookupEnv("QFS_API_KEY")
 	if ok {
 		apiKey = envVal
@@ -265,25 +298,39 @@ func setCommonVars(cCtx *cli.Context) error {
 	}
 
 	if apiKey == "" {
-		apiKey = promptKey()
+		apiKey, err = promptKey()
+		if err != nil {
+			return err
+		}
 	}
 
 	country = cCtx.String("country")
 	if country == "" {
-		country = selectCountry()
+		country, err = selectCountry()
+		if err != nil {
+			return err
+		}
 	}
 
 	ticker = cCtx.String("ticker")
 	if ticker == "" {
-		ticker = selectTicker(country, apiKey)
+		ticker, err = selectTicker(country, apiKey)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func promptKey() string {
+func printTip(info string) {
 	fmt.Println()
-	fmt.Println("Enter a valid API key for QuickFS.")
+	fmt.Println(info)
+	fmt.Println("---")
+}
+
+func promptKey() (string, error) {
+	printTip("Enter a valid API key for QuickFS.")
 
 	validate := func(input string) error {
 		if input == "" {
@@ -308,25 +355,24 @@ func promptKey() string {
 
 	response, err := s.Run()
 	if err != nil {
-		log.Fatalf("an error occurred when setting the api key: %s", err)
+		return "", fmt.Errorf("an error occurred when setting the api key: %s", err)
 	}
 
-	return response
+	return response, nil
 }
 
-func selectTicker(country string, apiKey string) string {
-	fmt.Println()
-	fmt.Println("Start typing to find your ticker.")
+func selectTicker(country string, apiKey string) (string, error) {
+	printTip("Start typing to find your ticker.")
 
 	tickers, err := fetchTickers(country)
 	if err != nil {
-		log.Fatalf("an error occurred when fetching ticker: %s", err)
+		return "", fmt.Errorf("an error occurred when fetching ticker: %s", err)
 	}
 
 	searcher := func(input string, index int) bool {
 		ticker := strings.ToLower(tickers[index])
 		input = strings.Replace(strings.ToLower(input), " ", "", -1)
-		return strings.Contains(ticker, input)
+		return strings.HasPrefix(ticker, input)
 	}
 
 	s := promptui.Select{
@@ -338,15 +384,14 @@ func selectTicker(country string, apiKey string) string {
 
 	_, response, err := s.Run()
 	if err != nil {
-		log.Fatalf("an error occurred when setting the ticker: %s", err)
+		return "", fmt.Errorf("an error occurred when setting the ticker: %s", err)
 	}
 
-	return response
+	return response, nil
 }
 
-func selectCountry() string {
-	fmt.Println()
-	fmt.Println("Select the country that your ticker trades in.")
+func selectCountry() (string, error) {
+	printTip("Select the country that your ticker trades in.")
 
 	searcher := func(input string, index int) bool {
 		ticker := strings.ToLower(quickfs.CountryCodes[index])
@@ -363,18 +408,17 @@ func selectCountry() string {
 
 	_, response, err := s.Run()
 	if err != nil {
-		log.Fatalf("an error occurred when setting the country: %s", err)
+		return "", fmt.Errorf("an error occurred when setting the country: %s", err)
 	}
 
-	return response
+	return response, nil
 }
 
-func promptInt(label string, def int, info string) int {
+func promptInt(label string, def int, info string) (int, error) {
 	var val int
 
 	if info != "" {
-		fmt.Println()
-		fmt.Println(info)
+		printTip(info)
 	}
 
 	validate := func(input string) error {
@@ -401,18 +445,17 @@ func promptInt(label string, def int, info string) int {
 
 	_, err := s.Run()
 	if err != nil {
-		log.Fatalf("an error occurred when setting %s: %s", label, err)
+		return 0, err
 	}
 
-	return val
+	return val, nil
 }
 
-func promptFloat(label string, def float64, info string) float64 {
+func promptFloat(label string, def float64, info string) (float64, error) {
 	var val float64
 
 	if info != "" {
-		fmt.Println()
-		fmt.Println(info)
+		printTip(info)
 	}
 
 	validate := func(input string) error {
@@ -441,40 +484,53 @@ func promptFloat(label string, def float64, info string) float64 {
 
 	_, err := s.Run()
 	if err != nil {
-		log.Fatalf("an error occurred when setting %s: %s", label, err)
+		return 0.00, err
 	}
 
-	return val
+	return val, nil
 }
 
-func getFlagOrPromptFloat(cCtx *cli.Context, flagName, prompt, promptInfo string, defaultValue float64) float64 {
+func getFlagOrPromptFloat(
+	cCtx *cli.Context,
+	flagName, prompt, promptInfo string,
+	defaultValue float64,
+) (float64, error) {
 	value := cCtx.Float64(flagName)
 	if value == 0.00 {
 		return promptFloat(prompt, defaultValue, promptInfo)
 	}
-	return value
+	return value, nil
 }
 
-func getFlagOrPromptGrowthRate(cCtx *cli.Context, flagName, prompt, promptInfo string, series []int) float64 {
+func getFlagOrPromptGrowthRate(
+	cCtx *cli.Context,
+	flagName, prompt, promptInfo string,
+	series []int,
+) (float64, error) {
 	value := cCtx.Float64(flagName)
 	if value == 0.00 {
 		cagr, _ := calc.CAGR(series)
 		return promptFloat(prompt, cagr, promptInfo)
 	}
-	return value
+	return value, nil
 }
 
-func getFlagOrPromptInt(cCtx *cli.Context, flagName, prompt, promptInfo string, defaultValue int) int {
+func getFlagOrPromptInt(
+	cCtx *cli.Context,
+	flagName, prompt, promptInfo string,
+	defaultValue int,
+) (int, error) {
 	value := cCtx.Int(flagName)
 	if value == 0 {
 		return promptInt(prompt, defaultValue, promptInfo)
 	}
-	return value
+	return value, nil
 }
 
 func selectDiscountRateOpt() string {
-	fmt.Println()
-	fmt.Println("There are a few options for calculating a discount rate. Choose which one you would like to use.")
+	printTip(
+		"There are a few options for calculating a discount rate. Choose which one you would like to use.",
+	)
 
 	s := promptui.Select{
 		Label: "Discount Rate Options",
@@ -483,7 +539,7 @@ func selectDiscountRateOpt() string {
 
 	_, response, err := s.Run()
 	if err != nil {
-		log.Fatalf("an error occurred when selecting a discount rate option: %s", err)
+		return ""
 	}
 
 	return response

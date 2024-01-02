@@ -7,13 +7,34 @@ import (
 	"io"
 	"net/http"
 	"strings"
-
-	"github.com/rs/zerolog/log"
 )
 
-var CountryCodes = []string{"US", "AT", "AU", "BE", "CA", "CH", "DE", "DK", "ES", "FI", "FI", "FR", "GR", "IT", "LN", "MM", "NL", "NO", "NZ", "PL", "SE"}
+var CountryCodes = []string{
+	"US",
+	"AT",
+	"AU",
+	"BE",
+	"CA",
+	"CH",
+	"DE",
+	"DK",
+	"ES",
+	"FI",
+	"FI",
+	"FR",
+	"GR",
+	"IT",
+	"LN",
+	"MM",
+	"NL",
+	"NO",
+	"NZ",
+	"PL",
+	"SE",
+}
 
 type Data struct {
+	Price        float64 `json:"price"`
 	Shares       int     `json:"shares"`
 	TaxRate      float64 `json:"taxRate"`
 	DebtToEquity float64 `json:"debtToEquity"`
@@ -82,22 +103,12 @@ func NewQuickFS(opts ...ConfigOption) *quickFS {
 	return q
 }
 
-type dataResponse struct {
-	Data struct {
-		Shares       []int     `json:"shares"`
-		TaxRate      []float64 `json:"taxRate"`
-		DebtToEquity []float64 `json:"debtToEquity"`
-		Beta         float64   `json:"beta"`
-		FCFHistory   []int     `json:"fcfHistory"`
-		CFFDividends []int     `json:"cffDividends"`
-	} `json:"data"`
-}
-
 // Gets data from QuickFS. Data points can be customized when creating the QuickFS instance, using "with" options, e.g: quickfs.NewQuickFS(quickfs.WithCFFDividends()).
 func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 	var data Data
 
 	type payloadData struct {
+		Price        string `json:"price"`
 		Shares       string `json:"shares"`
 		TaxRate      string `json:"taxRate"`
 		DebtToEquity string `json:"debtToEquity,omitempty"`
@@ -112,23 +123,41 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 
 	pl := &payload{
 		Data: payloadData{
-			Shares:  q.formatQFS(ticker, country, "shares_basic"),
+			Price:   q.formatQFS(ticker, country, "price"),
+			Shares:  q.formatQFS(ticker, country, "shares_diluted"),
 			TaxRate: q.formatQFS(ticker, country, "income_tax_rate"),
 		},
 	}
 
 	q.formatOptionalQFS(&pl.Data.DebtToEquity, ticker, country, q.debtToEquity, "debt_to_equity")
 	q.formatOptionalQFS(&pl.Data.Beta, ticker, country, q.beta, "beta")
-	q.formatOptionalQFS(&pl.Data.FCFHistory, ticker, country, q.fcf, "fcf", fmt.Sprintf("FY-%d:FY", q.fyHistory-1))
-	q.formatOptionalQFS(&pl.Data.CFFDividends, ticker, country, q.cffDividends, "cff_dividend_paid", fmt.Sprintf("FY-%d:FY", q.fyHistory-1))
+	q.formatOptionalQFS(
+		&pl.Data.FCFHistory,
+		ticker,
+		country,
+		q.fcf,
+		"fcf",
+		fmt.Sprintf("FY-%d:FY", q.fyHistory-1),
+	)
+	q.formatOptionalQFS(
+		&pl.Data.CFFDividends,
+		ticker,
+		country,
+		q.cffDividends,
+		"cff_dividend_paid",
+		fmt.Sprintf("FY-%d:FY", q.fyHistory-1),
+	)
 
 	jsonPayload, err := json.Marshal(pl)
 	if err != nil {
-		log.Error().Err(err).Msg("error marshaling quickfs payload")
 		return data, err
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "https://public-api.quickfs.net/v1/data/batch", bytes.NewReader(jsonPayload))
+	req, _ := http.NewRequest(
+		http.MethodPost,
+		"https://public-api.quickfs.net/v1/data/batch",
+		bytes.NewReader(jsonPayload),
+	)
 	q.setHeaders(req)
 
 	res, err := q.client.Do(req)
@@ -150,12 +179,25 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 		return data, err
 	}
 
+	type dataResponse struct {
+		Data struct {
+			Price        float64   `json:"price"`
+			Shares       []int     `json:"shares"`
+			TaxRate      []float64 `json:"taxRate"`
+			DebtToEquity []float64 `json:"debtToEquity"`
+			Beta         float64   `json:"beta"`
+			FCFHistory   []int     `json:"fcfHistory"`
+			CFFDividends []int     `json:"cffDividends"`
+		} `json:"data"`
+	}
+
 	dataResp := dataResponse{}
 	if err = json.NewDecoder(bytes.NewBuffer(body)).Decode(&dataResp); err != nil {
 		return data, err
 	}
 
 	data = Data{
+		Price:   dataResp.Data.Price,
 		Shares:  dataResp.Data.Shares[0],
 		TaxRate: dataResp.Data.TaxRate[0],
 	}
@@ -177,7 +219,10 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 func (q *quickFS) GetCompanies(country string) (Companies, error) {
 	var companies Companies
 
-	reqUrl := fmt.Sprintf("https://public-api.quickfs.net/v1/companies/%s", strings.ToLower(country))
+	reqUrl := fmt.Sprintf(
+		"https://public-api.quickfs.net/v1/companies/%s",
+		strings.ToLower(country),
+	)
 
 	req, _ := http.NewRequest(http.MethodGet, reqUrl, nil)
 	q.setHeaders(req)
@@ -217,7 +262,13 @@ func (q *quickFS) formatQFS(ticker, country, metric string) string {
 	return fmt.Sprintf("QFS(%s:%s,%s)", ticker, country, metric)
 }
 
-func (q *quickFS) formatOptionalQFS(field *string, ticker, country string, condition bool, metric string, args ...interface{}) {
+func (q *quickFS) formatOptionalQFS(
+	field *string,
+	ticker, country string,
+	condition bool,
+	metric string,
+	args ...interface{},
+) {
 	if condition {
 		*field = fmt.Sprintf("QFS(%s:%s,%s", ticker, country, metric)
 		if len(args) > 0 {
