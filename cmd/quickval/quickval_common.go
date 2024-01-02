@@ -20,7 +20,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.ConfigOption) (quickfs.Data, int, float64, error) {
+func doCommonSetup(
+	cCtx *cli.Context,
+	writer *output.Writer,
+	opts ...quickfs.ConfigOption,
+) (quickfs.Data, int, float64, error) {
 	var (
 		data              quickfs.Data
 		equityRiskPremium float64
@@ -45,7 +49,11 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 		case "WACC":
 			equityRiskPremium = cCtx.Float64("risk-premium")
 			if equityRiskPremium == 0.0 {
-				equityRiskPremium, err = promptFloat("Equity Risk Premium", defaultERP, erpPromptInfo)
+				equityRiskPremium, err = promptFloat(
+					"Equity Risk Premium",
+					defaultERP,
+					erpPromptInfo,
+				)
 				if err != nil {
 					return data, fyHistory, discountRate, err
 				}
@@ -75,7 +83,13 @@ func doCommonSetup(cCtx *cli.Context, writer *output.Writer, opts ...quickfs.Con
 				return data, fyHistory, discountRate, fmt.Errorf("error getting data: %s", err)
 			}
 
-			wacc := calc.WACC(data.Beta, data.DebtToEquity, data.TaxRate, equityRiskPremium, riskFreeRate)
+			wacc := calc.WACC(
+				data.Beta,
+				data.DebtToEquity,
+				data.TaxRate,
+				equityRiskPremium,
+				riskFreeRate,
+			)
 
 			discountRate = wacc
 
@@ -246,7 +260,7 @@ func updateLocalCache(country, cacheFilePath string) error {
 		return err
 	}
 
-	return atomicWrite(cacheFilePath, data, 0755)
+	return atomicWrite(cacheFilePath, data, 0o755)
 }
 
 func atomicWrite(filename string, data []byte, perms fs.FileMode) error {
@@ -476,7 +490,11 @@ func promptFloat(label string, def float64, info string) (float64, error) {
 	return val, nil
 }
 
-func getFlagOrPromptFloat(cCtx *cli.Context, flagName, prompt, promptInfo string, defaultValue float64) (float64, error) {
+func getFlagOrPromptFloat(
+	cCtx *cli.Context,
+	flagName, prompt, promptInfo string,
+	defaultValue float64,
+) (float64, error) {
 	value := cCtx.Float64(flagName)
 	if value == 0.00 {
 		return promptFloat(prompt, defaultValue, promptInfo)
@@ -484,7 +502,11 @@ func getFlagOrPromptFloat(cCtx *cli.Context, flagName, prompt, promptInfo string
 	return value, nil
 }
 
-func getFlagOrPromptGrowthRate(cCtx *cli.Context, flagName, prompt, promptInfo string, series []int) (float64, error) {
+func getFlagOrPromptGrowthRate(
+	cCtx *cli.Context,
+	flagName, prompt, promptInfo string,
+	series []int,
+) (float64, error) {
 	value := cCtx.Float64(flagName)
 	if value == 0.00 {
 		cagr, _ := calc.CAGR(series)
@@ -493,7 +515,11 @@ func getFlagOrPromptGrowthRate(cCtx *cli.Context, flagName, prompt, promptInfo s
 	return value, nil
 }
 
-func getFlagOrPromptInt(cCtx *cli.Context, flagName, prompt, promptInfo string, defaultValue int) (int, error) {
+func getFlagOrPromptInt(
+	cCtx *cli.Context,
+	flagName, prompt, promptInfo string,
+	defaultValue int,
+) (int, error) {
 	value := cCtx.Int(flagName)
 	if value == 0 {
 		return promptInt(prompt, defaultValue, promptInfo)
@@ -502,7 +528,9 @@ func getFlagOrPromptInt(cCtx *cli.Context, flagName, prompt, promptInfo string, 
 }
 
 func selectDiscountRateOpt() string {
-	printTip("There are a few options for calculating a discount rate. Choose which one you would like to use.")
+	printTip(
+		"There are a few options for calculating a discount rate. Choose which one you would like to use.",
+	)
 
 	s := promptui.Select{
 		Label: "Discount Rate Options",

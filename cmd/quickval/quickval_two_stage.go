@@ -63,15 +63,42 @@ var twoStageCommand = &cli.Command{
 			return err
 		}
 
-		growthRate, err := getFlagOrPromptGrowthRate(cCtx, "growth-rate", "Growth Rate", growthPromptInfo, data.FCFHistory)
+		growthRate, err := getFlagOrPromptGrowthRate(
+			cCtx,
+			"growth-rate",
+			"Growth Rate",
+			growthPromptInfo,
+			data.FCFHistory,
+		)
 		if err != nil {
 			return err
 		}
-		currentFCF, err := getFlagOrPromptInt(cCtx, "current-fcf", "Current FCF", growthPromptInfo, data.FCFHistory[len(data.FCFHistory)-1])
+		currentFCF, err := getFlagOrPromptInt(
+			cCtx,
+			"current-fcf",
+			"Current FCF",
+			growthPromptInfo,
+			data.FCFHistory[len(data.FCFHistory)-1],
+		)
 		if err != nil {
 			return err
 		}
-		perpetualRate, err := getFlagOrPromptFloat(cCtx, "perpetual-rate", "Perpetual Growth Rate", perpetualGrowthInfo, defaultPerpetualRate)
+		perpetualRate, err := getFlagOrPromptFloat(
+			cCtx,
+			"perpetual-rate",
+			"Perpetual Growth Rate",
+			perpetualGrowthInfo,
+			defaultPerpetualRate,
+		)
+		if err != nil {
+			return err
+		}
+
+		expectedReturn, err := calc.ExpectedReturn(
+			growthRate,
+			float64(currentFCF)/float64(data.Shares),
+			data.Price,
+		)
 		if err != nil {
 			return err
 		}
@@ -88,7 +115,7 @@ var twoStageCommand = &cli.Command{
 			return err
 		}
 
-		writer.Projected(projectedFCF, growthRate)
+		writer.Projected(projectedFCF, growthRate, expectedReturn)
 		writer.FairValue(fairValue)
 		writer.Render()
 		return nil
