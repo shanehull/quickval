@@ -32,7 +32,7 @@ func main() {
 
 		file, _ := json.MarshalIndent(comp, "", "   ")
 		fn := fmt.Sprintf("tickers/%s.json", code)
-		if err := os.WriteFile(fn, file, 0o644); err != nil {
+		if err := os.WriteFile(fn, file, os.FileMode(0o664)); err != nil {
 			log.Error().Msgf("error writing file for country code %s: %s", code, err)
 			continue
 		}
