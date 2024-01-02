@@ -39,4 +39,6 @@ func WriterRender_Test(t *testing.T) {
 
 	assert.Contains(t, string(content), "FY HISTORIC DATA")
 	assert.Contains(t, string(content), "DISCOUNT RATE")
+	assert.Contains(t, string(content), "PROJECTIONS")
+	assert.Contains(t, string(content), "FAIR VALUE")
 }
