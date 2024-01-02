@@ -26,8 +26,6 @@ jobs:
           targets: linux/amd64,darwin/amd64,darwin/arm64,windows/amd64,
           v: true
           ldflags: -s -w
-      - name: Update Tickers
-        run: go run ./cmd/fetch_tickers/fetch_tickers.go --api-key=${{ secrets.QUICKFS_KEY }}
       - name: Install Dependencies
         run: npm install -g semantic-release @semantic-release/exec @semantic-release/git @semantic-release/github
       - name: Semantic Release
