@@ -3,6 +3,11 @@ name: Update Tickers
 on:
   schedule:
     - cron: "13 0 * * 1-5"
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "tickers/**"
 
 jobs:
   fetch:
