@@ -86,7 +86,7 @@ func (w *Writer) DiscountRate(rate float64) {
 	w.table.Append([]string{"", ""})
 	w.table.Append([]string{"----------------------------------------", "------------------"})
 	w.table.Append([]string{"DISCOUNT RATE", ""})
-	w.table.Append([]string{"Set by user", fmt.Sprintf("%.2f", rate)})
+	w.table.Append([]string{"User Specified", fmt.Sprintf("%.2f", rate)})
 
 	w.table.Append([]string{"", ""})
 }

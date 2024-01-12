@@ -75,12 +75,6 @@ func WithCFFDividends() ConfigOption {
 	}
 }
 
-func WithDebtToEquity() ConfigOption {
-	return func(q *quickFS) {
-		q.debtToEquity = true
-	}
-}
-
 func WithBeta() ConfigOption {
 	return func(q *quickFS) {
 		q.beta = true
@@ -123,20 +117,13 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 
 	pl := &payload{
 		Data: payloadData{
-			Price:   q.formatQFS(ticker, country, "price"),
-			Shares:  q.formatQFS(ticker, country, "shares_diluted", "FY"),
-			TaxRate: q.formatQFS(ticker, country, "income_tax_rate", "FY"),
+			Price:        q.formatQFS(ticker, country, "price"),
+			Shares:       q.formatQFS(ticker, country, "shares_diluted", "FY"),
+			TaxRate:      q.formatQFS(ticker, country, "income_tax_rate", "FY"),
+			DebtToEquity: q.formatQFS(ticker, country, "debt_to_equity", "FY"),
 		},
 	}
 
-	q.formatOptionalQFS(
-		&pl.Data.DebtToEquity,
-		ticker,
-		country,
-		q.debtToEquity,
-		"debt_to_equity",
-		"FY",
-	)
 	q.formatOptionalQFS(&pl.Data.Beta, ticker, country, q.beta, "beta")
 	q.formatOptionalQFS(
 		&pl.Data.FCFHistory,
@@ -209,7 +196,6 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 		TaxRate: dataResp.Data.TaxRate[0],
 	}
 
-	assignOptionalField(q.debtToEquity, &data.DebtToEquity, dataResp.Data.DebtToEquity[0])
 	assignOptionalField(q.beta, &data.Beta, dataResp.Data.Beta)
 	assignOptionalField(q.fcf, &data.FCFHistory, dataResp.Data.FCFHistory)
 
