@@ -46,7 +46,6 @@ type Data struct {
 type Companies []string
 
 type quickFS struct {
-	debtToEquity bool
 	beta         bool
 	fcf          bool
 	cffDividends bool
