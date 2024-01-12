@@ -13,7 +13,8 @@ import (
 var dividendDiscountCommand = &cli.Command{
 	Name:        "dividend",
 	Aliases:     []string{"ddm"},
-	Description: "a two-stage dividend discount model",
+	Description: "Performs a two-stage dividend discount model with a high growth stage and a perpetual growth stage",
+	Usage:       "Performs a two-stage DDM model.",
 	Flags: []cli.Flag{
 		&cli.Float64Flag{
 			Name:  "risk-free",

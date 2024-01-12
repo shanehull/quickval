@@ -12,7 +12,8 @@ import (
 var twoStageCommand = &cli.Command{
 	Name:        "two-stage",
 	Aliases:     []string{"dcf2", "dcfp"},
-	Description: "a perpetuity growth model with a high-growth stage and a perpetual growth stage",
+	Description: "Performs a two-stage (perpetualgrowth) DCF model with a high-growth stage and a perpetual growth stage.",
+	Usage:       "Performs a two-stage DCF model.",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:  "ticker",

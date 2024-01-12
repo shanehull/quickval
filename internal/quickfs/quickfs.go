@@ -124,12 +124,19 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 	pl := &payload{
 		Data: payloadData{
 			Price:   q.formatQFS(ticker, country, "price"),
-			Shares:  q.formatQFS(ticker, country, "shares_diluted"),
-			TaxRate: q.formatQFS(ticker, country, "income_tax_rate"),
+			Shares:  q.formatQFS(ticker, country, "shares_diluted", "FY"),
+			TaxRate: q.formatQFS(ticker, country, "income_tax_rate", "FY"),
 		},
 	}
 
-	q.formatOptionalQFS(&pl.Data.DebtToEquity, ticker, country, q.debtToEquity, "debt_to_equity")
+	q.formatOptionalQFS(
+		&pl.Data.DebtToEquity,
+		ticker,
+		country,
+		q.debtToEquity,
+		"debt_to_equity",
+		"FY",
+	)
 	q.formatOptionalQFS(&pl.Data.Beta, ticker, country, q.beta, "beta")
 	q.formatOptionalQFS(
 		&pl.Data.FCFHistory,
@@ -258,8 +265,15 @@ func (q *quickFS) setHeaders(req *http.Request) {
 	req.Header.Set("X-QFS-API-Key", q.apiKey)
 }
 
-func (q *quickFS) formatQFS(ticker, country, metric string) string {
-	return fmt.Sprintf("QFS(%s:%s,%s)", ticker, country, metric)
+func (q *quickFS) formatQFS(ticker, country, metric string, args ...interface{}) string {
+	field := fmt.Sprintf("QFS(%s:%s,%s", ticker, country, metric)
+	if len(args) > 0 {
+		field += fmt.Sprintf(",%s)", fmt.Sprintf(args[0].(string)))
+	} else {
+		field += ")"
+	}
+
+	return field
 }
 
 func (q *quickFS) formatOptionalQFS(
