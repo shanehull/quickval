@@ -12,7 +12,8 @@ import (
 var growthExitCommand = &cli.Command{
 	Name:        "growth-exit",
 	Aliases:     []string{"dcf", "dcfe"},
-	Description: "a growth-exit model with a high-growth stage and an exit multiple",
+	Description: "Performs a growth-exit DCF model with a high-growth stage and an exit multiple.",
+	Usage:       "Performs a growth-exit DCF model.",
 	Flags: []cli.Flag{
 		&cli.Float64Flag{
 			Name:  "risk-free",

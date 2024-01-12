@@ -314,7 +314,7 @@ func setCommonVars(cCtx *cli.Context) error {
 
 	ticker = cCtx.String("ticker")
 	if ticker == "" {
-		ticker, err = selectTicker(country, apiKey)
+		ticker, err = selectTicker(country)
 		if err != nil {
 			return err
 		}
@@ -361,7 +361,7 @@ func promptKey() (string, error) {
 	return response, nil
 }
 
-func selectTicker(country string, apiKey string) (string, error) {
+func selectTicker(country string) (string, error) {
 	printTip("Start typing to find your ticker.")
 
 	tickers, err := fetchTickers(country)
@@ -371,7 +371,7 @@ func selectTicker(country string, apiKey string) (string, error) {
 
 	searcher := func(input string, index int) bool {
 		ticker := strings.ToLower(tickers[index])
-		input = strings.Replace(strings.ToLower(input), " ", "", -1)
+		input = strings.ReplaceAll(strings.ToLower(input), " ", "")
 		return strings.HasPrefix(ticker, input)
 	}
 
@@ -395,7 +395,7 @@ func selectCountry() (string, error) {
 
 	searcher := func(input string, index int) bool {
 		ticker := strings.ToLower(quickfs.CountryCodes[index])
-		input = strings.Replace(strings.ToLower(input), " ", "", -1)
+		input = strings.ReplaceAll(strings.ToLower(input), " ", "")
 		return strings.Contains(ticker, input)
 	}
 
