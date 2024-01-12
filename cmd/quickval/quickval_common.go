@@ -70,7 +70,6 @@ func doCommonSetup(
 			mergedOpts := append(opts,
 				quickfs.WithAPIKey(apiKey),
 				quickfs.WithFYHistory(fyHistory),
-				quickfs.WithDebtToEquity(),
 				quickfs.WithBeta(),
 			)
 
@@ -115,7 +114,6 @@ func doCommonSetup(
 			mergedOpts := append(opts,
 				quickfs.WithAPIKey(apiKey),
 				quickfs.WithFYHistory(fyHistory),
-				quickfs.WithDebtToEquity(),
 			)
 
 			qfs := quickfs.NewQuickFS(
@@ -140,6 +138,11 @@ func doCommonSetup(
 			writer.Data(&data)
 			writer.WACC(discountRate, equityRiskPremium, riskFreeRate, &data)
 		case "Custom Input":
+			discountRate, err = promptFloat("Discount Rate", 0.10, discPromptInfo)
+			if err != nil {
+				return data, 0, 0, err
+			}
+
 			mergedOpts := append(opts,
 				quickfs.WithAPIKey(apiKey),
 				quickfs.WithFYHistory(fyHistory),
@@ -152,11 +155,6 @@ func doCommonSetup(
 			data, err = qfs.GetData(ticker, country)
 			if err != nil {
 				return data, 0, 0, fmt.Errorf("error getting data: %s", err)
-			}
-
-			discountRate, err = promptFloat("Discount Rate", 0.06, discPromptInfo)
-			if err != nil {
-				return data, 0, 0, err
 			}
 
 			writer.Data(&data)
