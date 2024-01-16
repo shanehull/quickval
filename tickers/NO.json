@@ -347,5 +347,13 @@
    "BWO:NO",
    "BWE:NO",
    "SPOT:NO",
-   "TRMED:NO"
+   "TRMED:NO",
+   "ASTRO:NO",
+   "OMDA:NO",
+   "MVE:NO",
+   "NORCO:NO",
+   "SPIR:NO",
+   "BBERG:NO",
+   "LOKO:NO",
+   "B2I:NO"
 ]
