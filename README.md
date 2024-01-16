@@ -101,7 +101,8 @@ $$
 
 :warning: NOTE
 
-This is an experimental feature, and there is quite a lot wrong with it, namely sample size. It may not be any better than a WACC calculated using the CAPM model.
+This is an experimental feature, and there is quite a lot wrong with it, namely the small sample size used to calculate variance.
+It may not be any better than a WACC calculated using the CAPM model.
 
 I emailed Aswath Damodaran ("The Dean of Valuation") on the subject, and he said, quote:
 
@@ -109,3 +110,7 @@ I emailed Aswath Damodaran ("The Dean of Valuation") on the subject, and he said
 Statistically, you don’t have very many observations and pragmatically, in a diversified portfolio,
 it is only the portion of the risk that you cannot diversify away that goes into a discount rate.
 Hence, if you decide to compute your risk using it, you need to scale it to the average to get a measure of relative risk."
+
+I tend to agree with him, however, in practice, using this method over a CAPM WACC doesn't tip the scales on your final number.
+
+No matter the methods used to measure risk, you should not be mistaking a DCF calculation for an accurate indication of future price.
