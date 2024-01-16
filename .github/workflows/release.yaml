@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - chore/fix-release-action
     paths-ignore:
       - "tickers/**"
 
@@ -26,9 +27,17 @@ jobs:
           targets: linux/amd64,darwin/amd64,darwin/arm64,windows/amd64,
           v: true
           ldflags: -s -w
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+          cache: "pnpm"
       - name: Install Dependencies
-        run: npm install -g semantic-release @semantic-release/exec @semantic-release/git @semantic-release/github
+        run: pnpm install -g semantic-release @semantic-release/exec @semantic-release/git @semantic-release/github
       - name: Semantic Release
-        run: npx semantic-release
+        run: pnpm dlx semantic-release --dry-run
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
