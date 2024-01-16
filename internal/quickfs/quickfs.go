@@ -7,34 +7,11 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
-var CountryCodes = []string{
-	"US",
-	"AT",
-	"AU",
-	"BE",
-	"CA",
-	"CH",
-	"DE",
-	"DK",
-	"ES",
-	"FI",
-	"FI",
-	"FR",
-	"GR",
-	"IT",
-	"LN",
-	"MM",
-	"NL",
-	"NO",
-	"NZ",
-	"PL",
-	"SE",
-}
-
 type Data struct {
-	Price        float64 `json:"price"`
 	Shares       int     `json:"shares"`
 	TaxRate      float64 `json:"taxRate"`
 	DebtToEquity float64 `json:"debtToEquity"`
@@ -46,6 +23,7 @@ type Data struct {
 type Companies []string
 
 type quickFS struct {
+	debtToEquity bool
 	beta         bool
 	fcf          bool
 	cffDividends bool
@@ -71,6 +49,12 @@ func WithFCF() ConfigOption {
 func WithCFFDividends() ConfigOption {
 	return func(q *quickFS) {
 		q.cffDividends = true
+	}
+}
+
+func WithDebtToEquity() ConfigOption {
+	return func(q *quickFS) {
+		q.debtToEquity = true
 	}
 }
 
@@ -101,7 +85,6 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 	var data Data
 
 	type payloadData struct {
-		Price        string `json:"price"`
 		Shares       string `json:"shares"`
 		TaxRate      string `json:"taxRate"`
 		DebtToEquity string `json:"debtToEquity,omitempty"`
@@ -114,44 +97,52 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 		Data payloadData `json:"data"`
 	}
 
+	type response struct {
+		Data struct {
+			Shares       []int     `json:"shares"`
+			TaxRate      []float64 `json:"taxRate"`
+			DebtToEquity []float64 `json:"debtToEquity"`
+			Beta         float64   `json:"beta"`
+			FCFHistory   []int     `json:"fcfHistory"`
+			CFFDividends []int     `json:"cffDividends"`
+		} `json:"data"`
+	}
+
 	pl := &payload{
 		Data: payloadData{
-			Price:        q.formatQFS(ticker, country, "price"),
-			Shares:       q.formatQFS(ticker, country, "shares_diluted", "FY"),
-			TaxRate:      q.formatQFS(ticker, country, "income_tax_rate", "FY"),
-			DebtToEquity: q.formatQFS(ticker, country, "debt_to_equity", "FY"),
+			Shares:  fmt.Sprintf("QFS(%s:%s,shares_basic,FY)", ticker, country),
+			TaxRate: fmt.Sprintf("QFS(%s:%s,income_tax_rate,FY)", ticker, country),
 		},
 	}
 
-	q.formatOptionalQFS(&pl.Data.Beta, ticker, country, q.beta, "beta")
-	q.formatOptionalQFS(
-		&pl.Data.FCFHistory,
-		ticker,
-		country,
-		q.fcf,
-		"fcf",
-		fmt.Sprintf("FY-%d:FY", q.fyHistory-1),
-	)
-	q.formatOptionalQFS(
-		&pl.Data.CFFDividends,
-		ticker,
-		country,
-		q.cffDividends,
-		"cff_dividend_paid",
-		fmt.Sprintf("FY-%d:FY", q.fyHistory-1),
-	)
+	if q.debtToEquity {
+		pl.Data.DebtToEquity = fmt.Sprintf("QFS(%s:%s,debt_to_equity,FY)", ticker, country)
+	}
+	if q.beta {
+		pl.Data.Beta = fmt.Sprintf("QFS(%s:%s,beta,FY)", ticker, country)
+	}
+	if q.fcf {
+		if q.fyHistory == 1 {
+			pl.Data.FCFHistory = fmt.Sprintf("QFS(%s:%s,fcf,FY)", ticker, country)
+		}
+		pl.Data.FCFHistory = fmt.Sprintf("QFS(%s:%s,fcf,FY-%d:FY)", ticker, country, q.fyHistory-1)
+	}
+	if q.cffDividends {
+		if q.fyHistory == 1 {
+			pl.Data.CFFDividends = fmt.Sprintf("QFS(%s:%s,cff_dividend_paid,FY)", ticker, country)
+		}
+		pl.Data.CFFDividends = fmt.Sprintf("QFS(%s:%s,cff_dividend_paid,FY-%d:FY)", ticker, country, q.fyHistory-1)
+	}
 
 	jsonPayload, err := json.Marshal(pl)
 	if err != nil {
+		log.Error().Err(err).Msg("error marshaling quickfs payload")
 		return data, err
 	}
 
-	req, _ := http.NewRequest(
-		http.MethodPost,
-		"https://public-api.quickfs.net/v1/data/batch",
-		bytes.NewReader(jsonPayload),
-	)
-	q.setHeaders(req)
+	req, _ := http.NewRequest(http.MethodPost, "https://public-api.quickfs.net/v1/data/batch", bytes.NewReader(jsonPayload))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-QFS-API-Key", q.apiKey)
 
 	res, err := q.client.Do(req)
 	if err != nil {
@@ -168,37 +159,37 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 	}
 
 	bodyStr := string(body)
-	if err := handleErrorInBody(bodyStr, ticker, country); err != nil {
-		return data, err
+	if strings.Contains(bodyStr, "UnsupportedCompanyError") {
+		return data, fmt.Errorf("unsupported company, %s:%s", ticker, country)
 	}
-
-	type dataResponse struct {
-		Data struct {
-			Price        float64   `json:"price"`
-			Shares       []int     `json:"shares"`
-			TaxRate      []float64 `json:"taxRate"`
-			DebtToEquity []float64 `json:"debtToEquity"`
-			Beta         float64   `json:"beta"`
-			FCFHistory   []int     `json:"fcfHistory"`
-			CFFDividends []int     `json:"cffDividends"`
-		} `json:"data"`
+	if strings.Contains(bodyStr, "UnsupportedMetricError") {
+		return data, fmt.Errorf("unsupported metric, body: %s", bodyStr)
 	}
+	// if strings.Contains(bodyStr, "InsufficientQuotaError") { // this results in a 429 so is moot, I think
+	// 	return data, fmt.Errorf("insufficient quota, %s:%s", ticker, country)
+	// }
 
-	dataResp := dataResponse{}
+	dataResp := response{}
 	if err = json.NewDecoder(bytes.NewBuffer(body)).Decode(&dataResp); err != nil {
 		return data, err
 	}
 
 	data = Data{
-		Price:   dataResp.Data.Price,
 		Shares:  dataResp.Data.Shares[0],
 		TaxRate: dataResp.Data.TaxRate[0],
 	}
 
-	assignOptionalField(q.beta, &data.Beta, dataResp.Data.Beta)
-	assignOptionalField(q.fcf, &data.FCFHistory, dataResp.Data.FCFHistory)
-
+	if q.debtToEquity {
+		data.DebtToEquity = dataResp.Data.DebtToEquity[0]
+	}
+	if q.beta {
+		data.Beta = dataResp.Data.Beta
+	}
+	if q.fcf {
+		data.FCFHistory = dataResp.Data.FCFHistory
+	}
 	if q.cffDividends {
+		// we need to roll through these and reverse them - they're from the perspective of the firm
 		for _, c := range dataResp.Data.CFFDividends {
 			data.CFFDividends = append(data.CFFDividends, reverseInt(c))
 		}
@@ -207,17 +198,14 @@ func (q *quickFS) GetData(ticker string, country string) (Data, error) {
 	return data, nil
 }
 
-// Gets all supported companies for the specified (ISO Alpha-2) country code, e.g; ["AAPL:US", ...].
 func (q *quickFS) GetCompanies(country string) (Companies, error) {
 	var companies Companies
 
-	reqUrl := fmt.Sprintf(
-		"https://public-api.quickfs.net/v1/companies/%s",
-		strings.ToLower(country),
-	)
+	reqUrl := fmt.Sprintf("https://public-api.quickfs.net/v1/companies/%s", strings.ToLower(country))
 
 	req, _ := http.NewRequest(http.MethodGet, reqUrl, nil)
-	q.setHeaders(req)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-QFS-API-Key", q.apiKey)
 
 	res, err := q.client.Do(req)
 	if err != nil {
@@ -243,66 +231,6 @@ func (q *quickFS) GetCompanies(country string) (Companies, error) {
 	}
 
 	return dataResp.Data, nil
-}
-
-func (q *quickFS) setHeaders(req *http.Request) {
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-QFS-API-Key", q.apiKey)
-}
-
-func (q *quickFS) formatQFS(ticker, country, metric string, args ...interface{}) string {
-	field := fmt.Sprintf("QFS(%s:%s,%s", ticker, country, metric)
-	if len(args) > 0 {
-		field += fmt.Sprintf(",%s)", fmt.Sprintf(args[0].(string)))
-	} else {
-		field += ")"
-	}
-
-	return field
-}
-
-func (q *quickFS) formatOptionalQFS(
-	field *string,
-	ticker, country string,
-	condition bool,
-	metric string,
-	args ...interface{},
-) {
-	if condition {
-		*field = fmt.Sprintf("QFS(%s:%s,%s", ticker, country, metric)
-		if len(args) > 0 {
-			*field += fmt.Sprintf(",%s)", fmt.Sprintf(args[0].(string)))
-		} else {
-			*field += ")"
-		}
-	}
-}
-
-func assignOptionalField(condition bool, target interface{}, source interface{}) {
-	if condition {
-		switch v := target.(type) {
-		case *float64:
-			*v = source.(float64)
-		case *int:
-			*v = source.(int)
-		case *[]int:
-			*v = source.([]int)
-		case *[]float64:
-			*v = source.([]float64)
-		}
-	}
-}
-
-func handleErrorInBody(bodyStr, ticker, country string) error {
-	if strings.Contains(bodyStr, "UnsupportedCompanyError") {
-		return fmt.Errorf("unsupported company, %s:%s", ticker, country)
-	} else if strings.Contains(bodyStr, "UnsupportedMetricError") {
-		return fmt.Errorf("unsupported metric")
-	}
-	// else if strings.Contains(bodyStr, "InsufficientQuotaError") {  // this results in a 429 so is moot, I think
-	//     return fmt.Errorf("insufficient quota, %s:%s", ticker, country)
-	// }
-	return nil
 }
 
 func reverseInt(value int) int {

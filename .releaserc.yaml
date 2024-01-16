@@ -1,5 +1,6 @@
 branches:
   - name: release
+    channel: latest
   - name: main
     prerelease: pre
     channel: pre

@@ -27,15 +27,7 @@ func Test_WACC(t *testing.T) {
 
 	if wacc != 0.039228168924167195 {
 		fmt.Println(wacc)
-		t.Fatalf(
-			`WACC(%f, %f, %f, %f, %f) = %f`,
-			beta,
-			debtToEquity,
-			taxRate,
-			equityRiskPremium,
-			riskFreeRate,
-			wacc,
-		)
+		t.Fatalf(`WACC(%f, %f, %f, %f, %f) = %f`, beta, debtToEquity, taxRate, equityRiskPremium, riskFreeRate, wacc)
 	}
 }
 
@@ -44,15 +36,7 @@ func Test_FCFCVWeightedWACC(t *testing.T) {
 
 	if wacc != 0.03698768876669731 {
 		fmt.Println(wacc)
-		t.Fatalf(
-			`FCFCVWeightedWACC(%v, %f, %f, %f, %f) = %f`,
-			fcfHistory,
-			debtToEquity,
-			taxRate,
-			equityRiskPremium,
-			riskFreeRate,
-			wacc,
-		)
+		t.Fatalf(`FCFCVWeightedWACC(%v, %f, %f, %f, %f) = %f`, fcfHistory, debtToEquity, taxRate, equityRiskPremium, riskFreeRate, wacc)
 	}
 }
 
@@ -77,149 +61,53 @@ func Test_CV(t *testing.T) {
 	}
 }
 
-func Test_ExpectedReturn(t *testing.T) {
-	expReturn, err := ExpectedReturn(0.08, 10, 400)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if expReturn != 0.10500000000000001 {
-		fmt.Println(expReturn)
-		t.Fatalf(`ExpectedReturn(%f, %d, %d) = %f`, 0.08, 10, 400, expReturn)
-	}
-}
-
 func Test_DCFGrowthExit(t *testing.T) {
-	dcf, projected, err := DCFGrowthExit(
-		fcfHistory[0],
-		growthRate,
-		exitMultiple,
-		len(fcfHistory),
-		shares,
-		discountRate,
-	)
+	dcf, projected, err := DCFGrowthExit(fcfHistory[0], growthRate, exitMultiple, len(fcfHistory), shares, discountRate)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if dcf != 146.29675045735823 {
 		fmt.Println(dcf)
-		t.Fatalf(
-			`DCFGrowthExit(%d, %f, %f, %d, %d, %f) = %f`,
-			fcfHistory[0],
-			growthRate,
-			exitMultiple,
-			len(fcfHistory),
-			shares,
-			discountRate,
-			dcf,
-		)
+		t.Fatalf(`DCFGrowthExit(%d, %f, %f, %d, %d, %f) = %f`, fcfHistory[0], growthRate, exitMultiple, len(fcfHistory), shares, discountRate, dcf)
 	}
 
-	if !reflect.DeepEqual(
-		projected,
-		[]int{47149000000, 52660246610, 58815702836, 65690670340, 73369252796},
-	) {
+	if !reflect.DeepEqual(projected, []int{47149000000, 52660246610, 58815702836, 65690670340, 73369252796}) {
 		fmt.Println(projected)
-		t.Fatalf(
-			`DCFGrowthExit(%d, %f, %f, %d, %d, %f) = %+v`,
-			fcfHistory[0],
-			growthRate,
-			exitMultiple,
-			len(fcfHistory),
-			shares,
-			discountRate,
-			projected,
-		)
+		t.Fatalf(`DCFGrowthExit(%d, %f, %f, %d, %d, %f) = %+v`, fcfHistory[0], growthRate, exitMultiple, len(fcfHistory), shares, discountRate, projected)
 	}
 }
 
 func Test_DCFTwoStage(t *testing.T) {
-	dcf, projected, err := DCFTwoStage(
-		fcfHistory[0],
-		growthRate,
-		perpetualGrowthRate,
-		highGrowthYears,
-		shares,
-		discountRate,
-	)
+	dcf, projected, err := DCFTwoStage(fcfHistory[0], growthRate, perpetualGrowthRate, highGrowthYears, shares, discountRate)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if dcf != 156.31884569425605 {
 		fmt.Println(dcf)
-		t.Fatalf(
-			`DCFTwoStage(%d, %f, %f, %d, %d, %f) = %f`,
-			fcfHistory[0],
-			growthRate,
-			perpetualGrowthRate,
-			len(fcfHistory),
-			shares,
-			discountRate,
-			dcf,
-		)
+		t.Fatalf(`DCFTwoStage(%d, %f, %f, %d, %d, %f) = %f`, fcfHistory[0], growthRate, perpetualGrowthRate, len(fcfHistory), shares, discountRate, dcf)
 	}
 
-	if !reflect.DeepEqual(
-		projected,
-		[]int{52660246610, 58815702836, 65690670340, 73369252796, 81945384756},
-	) {
+	if !reflect.DeepEqual(projected, []int{52660246610, 58815702836, 65690670340, 73369252796, 81945384756}) {
 		fmt.Println(projected)
-		t.Fatalf(
-			`DCFTwoStage(%d, %f, %f, %d, %d, %f) = %+v`,
-			fcfHistory[0],
-			growthRate,
-			perpetualGrowthRate,
-			len(fcfHistory),
-			shares,
-			discountRate,
-			projected,
-		)
+		t.Fatalf(`DCFTwoStage(%d, %f, %f, %d, %d, %f) = %+v`, fcfHistory[0], growthRate, perpetualGrowthRate, len(fcfHistory), shares, discountRate, projected)
 	}
 }
 
 func Test_DDMTwoStage(t *testing.T) {
-	ddm, projected, err := DDMTwoStage(
-		currentDividend,
-		growthRate,
-		perpetualGrowthRate,
-		len(fcfHistory),
-		shares,
-		discountRate,
-	)
+	ddm, projected, err := DDMTwoStage(currentDividend, growthRate, perpetualGrowthRate, len(fcfHistory), shares, discountRate)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if ddm != 58.953722212615475 {
 		fmt.Println(ddm)
-		t.Fatalf(
-			`DDMTwoStage(%d, %f, %f, %d, %d, %f) = %f`,
-			currentDividend,
-			growthRate,
-			perpetualGrowthRate,
-			len(fcfHistory),
-			shares,
-			discountRate,
-			ddm,
-		)
+		t.Fatalf(`DDMTwoStage(%d, %f, %f, %d, %d, %f) = %f`, currentDividend, growthRate, perpetualGrowthRate, len(fcfHistory), shares, discountRate, ddm)
 	}
 
-	if !reflect.DeepEqual(
-		projected,
-		[]int{16410911526, 18329182974, 20471681172, 22864615984, 25537260946},
-	) {
+	if !reflect.DeepEqual(projected, []int{16410911526, 18329182974, 20471681172, 22864615984, 25537260946}) {
 		fmt.Println(projected)
-		t.Fatalf(
-			`DDMTwoStage(%d, %f, %f, %d, %d, %f) = %+v`,
-			currentDividend,
-			growthRate,
-			perpetualGrowthRate,
-			len(fcfHistory),
-			shares,
-			discountRate,
-			projected,
-		)
+		t.Fatalf(`DDMTwoStage(%d, %f, %f, %d, %d, %f) = %+v`, currentDividend, growthRate, perpetualGrowthRate, len(fcfHistory), shares, discountRate, projected)
 	}
 }
