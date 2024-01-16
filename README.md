@@ -99,7 +99,7 @@ $$
 X = \ Mean
 $$
 
-[!NOTE]
+:warning: NOTE
 This is an experimental feature, and there is quite a lot wrong with it, namely sample size. It may not be any better than a WACC calculated using the CAPM model.
 I emailed Aswath Damodaran ("The Dean of Valuation") on the subject, and he said, quote:
 "The problem with using free cash flows or accounting earnings to measure risk is both statistical and theoretical.
