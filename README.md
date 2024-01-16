@@ -31,15 +31,15 @@ You can simply run `quickval` with no arguments to get started, however, to avoi
 
 ```
 NAME:
-   quickval - Perform quick valuations using QuickFS API
+   quickval - Perform quick valuations using the QuickFS API
 
 USAGE:
-   quickval [global options] command [command options] [arguments...]
+   quickval [global options] command [command options]
 
 COMMANDS:
-   growth-exit, dcf, dcfe
-   two-stage, dcf2, dcfp
-   dividend, ddm
+   growth-exit, dcf, dcfe  Performs a growth-exit DCF model.
+   two-stage, dcf2, dcfp   Performs a two-stage DCF model.
+   dividend, ddm           Performs a two-stage DDM model.
    help, h                 Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
@@ -55,13 +55,13 @@ E.g; the growth-exit model takes the following args, but will prompt and suggest
 
 ```
 NAME:
-   quickval growth-exit
+   quickval growth-exit - Performs a growth-exit DCF model.
 
 USAGE:
    quickval growth-exit [command options] [arguments...]
 
 DESCRIPTION:
-   a growth-exit model with a high-growth stage and an exit multiple
+   Performs a growth-exit DCF model with a high-growth stage and an exit multiple.
 
 OPTIONS:
    --risk-free value     the risk-free rate in decimal format (default: 0)
@@ -80,7 +80,8 @@ This is an alternative, experimental option for weighing the Cost of Capital. It
 
 It aims to gain a value edge, ignoring price altogether.
 
-It uses a Coefficient of Variance - a measure of relative variance in comparison to the mean of a set of numbers. In this case, the set of numbers is Free Cash Flow, or Dividends paid when performing a DDM valuation model.
+It uses a Coefficient of Variance - a measure of relative variance in comparison to the mean of a set of numbers.
+In this case, the set of numbers is Free Cash Flow, or Dividends paid when performing a DDM valuation model.
 
 It is calculated like so:
 
@@ -98,4 +99,18 @@ $$
 X = \ Mean
 $$
 
-More studies to come on this concept in the future...
+:warning: NOTE
+
+This is an experimental feature, and there is quite a lot wrong with it, namely the small sample size used to calculate variance.
+It may not be any better than a WACC calculated using the CAPM model.
+
+I emailed Aswath Damodaran ("The Dean of Valuation") on the subject, and he said, quote:
+
+> The problem with using free cash flows or accounting earnings to measure risk is both statistical and theoretical.
+> Statistically, you don’t have very many observations and pragmatically, in a diversified portfolio,
+> it is only the portion of the risk that you cannot diversify away that goes into a discount rate.
+> Hence, if you decide to compute your risk using it, you need to scale it to the average to get a measure of relative risk.
+
+I tend to agree with his points, however, I don't believe Modern Portfolio Theory (MPT) is an effective method of risk reduction, so I thought I'd explore another option.
+If you have similar views, then give it a try, but no matter the methods used to measure risk, you should not be mistaking a
+DCF calculation for an accurate indication of future price.
