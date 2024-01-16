@@ -26,9 +26,13 @@ jobs:
           targets: linux/amd64,darwin/amd64,darwin/arm64,windows/amd64,
           v: true
           ldflags: -s -w
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
       - name: Install Dependencies
         run: npm install -g semantic-release @semantic-release/exec @semantic-release/git @semantic-release/github
       - name: Semantic Release
-        run: npx semantic-release
+        run: npm semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
