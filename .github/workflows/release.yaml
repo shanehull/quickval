@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - chore/fix-release-action
     paths-ignore:
       - "tickers/**"
 
@@ -34,6 +33,6 @@ jobs:
       - name: Install Dependencies
         run: npm install -g semantic-release @semantic-release/exec @semantic-release/git @semantic-release/github
       - name: Semantic Release
-        run: npm dlx semantic-release --dry-run
+        run: npm semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
