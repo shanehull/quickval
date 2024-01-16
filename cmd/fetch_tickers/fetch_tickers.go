@@ -11,13 +11,7 @@ import (
 	"github.com/shanehull/quickval/internal/quickfs"
 )
 
-var (
-	_apiKey string
-)
-
-var (
-	countryCodes = []string{"US", "AT", "AU", "BE", "CA", "CH", "DE", "DK", "ES", "FI", "FI", "FR", "GR", "IT", "LN", "MM", "NL", "NO", "NZ", "PL", "SE"}
-)
+var _apiKey string
 
 func init() {
 	flag.StringVar(&_apiKey, "api-key", "", "quickfs api key")
@@ -28,7 +22,7 @@ func main() {
 
 	qfs := quickfs.NewQuickFS(quickfs.WithAPIKey(_apiKey))
 
-	for _, code := range countryCodes {
+	for _, code := range quickfs.CountryCodes {
 		start := time.Now()
 		comp, err := qfs.GetCompanies(code)
 		if err != nil {
@@ -38,11 +32,13 @@ func main() {
 
 		file, _ := json.MarshalIndent(comp, "", "   ")
 		fn := fmt.Sprintf("tickers/%s.json", code)
-		if err := os.WriteFile(fn, file, 0644); err != nil {
+		if err := os.WriteFile(fn, file, os.FileMode(0o664)); err != nil {
 			log.Error().Msgf("error writing file for country code %s: %s", code, err)
 			continue
 		}
 
-		log.Info().Int("took_ms", int(time.Since(start).Milliseconds())).Msgf("successfully fetched tickers for %s", code)
+		log.Info().
+			Int("took_ms", int(time.Since(start).Milliseconds())).
+			Msgf("successfully fetched tickers for %s", code)
 	}
 }

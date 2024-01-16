@@ -720,5 +720,11 @@
    "END:PL",
    "BLF:PL",
    "RES:PL",
-   "CBF:PL"
+   "CBF:PL",
+   "GAR:PL",
+   "GRE:PL",
+   "PLT:PL",
+   "ATS:PL",
+   "UFC:PL",
+   "GOV:PL"
 ]

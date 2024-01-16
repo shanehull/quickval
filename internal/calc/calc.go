@@ -18,8 +18,15 @@ import (
 //	riskFreeRate: The risk-free rate. This is the return that investors can expect to earn on a risk-free investment, such as a government bond.
 //
 // Returns:
-// The company's WACC as a float64.
-func WACC(beta float64, debtToEquityRatio float64, taxRate float64, equityRiskPremium float64, riskFreeRate float64) float64 {
+//
+//	The company's WACC as a float64.
+func WACC(
+	beta float64,
+	debtToEquityRatio float64,
+	taxRate float64,
+	equityRiskPremium float64,
+	riskFreeRate float64,
+) float64 {
 	unleveredBeta := beta / (1 + (1-taxRate)*debtToEquityRatio)
 
 	costOfEquity := riskFreeRate + (unleveredBeta * equityRiskPremium)
@@ -33,7 +40,7 @@ func WACC(beta float64, debtToEquityRatio float64, taxRate float64, equityRiskPr
 	return wacc
 }
 
-// FCFCVWeightedWACC calculates a WACC using the coeficient of variance of FCF in place of beta for a measure of risk.
+// FCFCVWeightedWACC calculates a WACC using the coefficient of variance of FCF in place of beta for a measure of risk.
 //
 // Arguments:
 //
@@ -44,14 +51,21 @@ func WACC(beta float64, debtToEquityRatio float64, taxRate float64, equityRiskPr
 //	riskFreeRate: The risk-free rate. This is the return that investors can expect to earn on a risk-free investment, such as a government bond.
 //
 // Returns:
-// The company's WACC as a float64.
+//
+//	The company's WACC as a float64.
 //
 // Note: The use of the coefficient of variance of FCF as a measure of risk in the WACC calculation is a relatively new approach. It is not yet widely accepted.
 // TODO: insert study of FCF CV here
-func FCFCVWeightedWACC(fcfHistory []int, debtToEquityRatio float64, taxRate float64, equityRiskPremium float64, riskFreeRate float64) float64 {
-	fvfCoeficientOfVariance := CV(fcfHistory)
+func FCFCVWeightedWACC(
+	fcfHistory []int,
+	debtToEquityRatio float64,
+	taxRate float64,
+	equityRiskPremium float64,
+	riskFreeRate float64,
+) float64 {
+	fvfCoefficientOfVariance := CV(fcfHistory)
 
-	costOfEquity := riskFreeRate + (fvfCoeficientOfVariance * equityRiskPremium)
+	costOfEquity := riskFreeRate + (fvfCoefficientOfVariance * equityRiskPremium)
 	costOfDebt := riskFreeRate * (1 - taxRate)
 
 	equityWeight := 1 / (1 + debtToEquityRatio)
@@ -75,8 +89,17 @@ func FCFCVWeightedWACC(fcfHistory []int, debtToEquityRatio float64, taxRate floa
 //
 // Returns:
 //
-//	The intrinsic value of the company, or an error if the number of shares outstanding is zero.
-func DCFGrowthExit(currentFCF int, growthRate float64, exitMultiple float64, numYears int, sharesOutstanding int, discountRate float64) (float64, []int, error) {
+//	The intrinsic value of the company.
+//	The projected FCFs.
+//	An error, if any.
+func DCFGrowthExit(
+	currentFCF int,
+	growthRate float64,
+	exitMultiple float64,
+	numYears int,
+	sharesOutstanding int,
+	discountRate float64,
+) (float64, []int, error) {
 	if sharesOutstanding <= 0 {
 		return 0, nil, fmt.Errorf("number of shares outstanding must be greater than zero")
 	}
@@ -117,8 +140,17 @@ func DCFGrowthExit(currentFCF int, growthRate float64, exitMultiple float64, num
 //
 // Returns:
 //
-//	The intrinsic value of the company, or an error if the number of shares outstanding is zero, the discount rate is less than or equal to the perpetual growth rate, or the numYears argument is negative.
-func DCFTwoStage(currentFCF int, growthRate float64, perpetualGrowthRate float64, numYears int, sharesOutstanding int, discountRate float64) (float64, []int, error) {
+//	The intrinsic value of the company
+//	The projected FCFs
+//	An error, if any
+func DCFTwoStage(
+	currentFCF int,
+	growthRate float64,
+	perpetualGrowthRate float64,
+	numYears int,
+	sharesOutstanding int,
+	discountRate float64,
+) (float64, []int, error) {
 	if sharesOutstanding <= 0 {
 		return 0, nil, fmt.Errorf("number of shares outstanding must be greater than zero")
 	}
@@ -164,8 +196,17 @@ func DCFTwoStage(currentFCF int, growthRate float64, perpetualGrowthRate float64
 //
 // Returns:
 //
-//	The intrinsic value of the company per share, or an error if the number of shares outstanding is zero, the discount rate is less than or equal to the perpetual growth rate, or the numYears argument is negative.
-func DDMTwoStage(currentDividend int, growthRate float64, perpetualGrowthRate float64, numYears int, sharesOutstanding int, discountRate float64) (float64, []int, error) {
+//	The intrinsic value of the company.
+//	The projected FCFs.
+//	An error or nil.
+func DDMTwoStage(
+	currentDividend int,
+	growthRate float64,
+	perpetualGrowthRate float64,
+	numYears int,
+	sharesOutstanding int,
+	discountRate float64,
+) (float64, []int, error) {
 	if sharesOutstanding <= 0 {
 		return 0, nil, fmt.Errorf("number of shares outstanding must be greater than zero")
 	}
@@ -231,13 +272,16 @@ func CV(values []int) float64 {
 //
 // Returns:
 //
-//	cagr: The compounded annual growth rate, as a float64.
-//	err: An error, if any.
+//	The compounded annual growth rate, as a float64.
+//	An error, if any.
 func CAGR(values []int) (float64, error) {
 	n := len(values)
 
 	if n < 2 {
-		return 0, fmt.Errorf("CAGR cannot be calculated with less than 2 values - check input: %v", values)
+		return 0, fmt.Errorf(
+			"CAGR cannot be calculated with less than 2 values - check input: %v",
+			values,
+		)
 	}
 
 	initialValue := float64(values[0])
@@ -245,23 +289,64 @@ func CAGR(values []int) (float64, error) {
 	numYears := float64(n)
 
 	if initialValue == 0 {
-		return 0, fmt.Errorf("initial value is zero, CAGR calculation is not possible - check input: %v", values)
+		return 0, fmt.Errorf(
+			"initial value is zero, CAGR calculation is not possible - check input: %v",
+			values,
+		)
 	}
 
 	var cagr float64
 
+	initialValueAbs := math.Abs(initialValue)
+	finalValueAbs := math.Abs(finalValue)
+	pow := 1.0 / numYears
+
 	switch {
-	case initialValue > 0 && finalValue >= 0:
-		cagr = math.Pow(finalValue/initialValue, 1.0/numYears) - 1
-	case initialValue < 0 && finalValue <= 0:
-		cagr = -1 * (math.Pow(math.Abs(finalValue)/math.Abs(initialValue), 1.0/numYears) - 1)
-	case initialValue < 0 && finalValue > 0:
-		cagr = math.Pow((finalValue+2*math.Abs(initialValue))/math.Abs(initialValue), 1.0/numYears) - 1
-	case initialValue > 0 && finalValue < 0:
-		cagr = -1 * (math.Pow((math.Abs(finalValue)+2*initialValue)/initialValue, 1.0/numYears) - 1)
-	default:
+	case initialValue == 0 || finalValue == 0:
 		cagr = 0
+	case initialValue > 0 && finalValue >= 0:
+		cagr = math.Pow(finalValue/initialValue, pow) - 1
+	case initialValue < 0 && finalValue <= 0:
+		cagr = -1 * (math.Pow(finalValueAbs/initialValueAbs, pow) - 1)
+	case initialValue < 0 && finalValue > 0:
+		cagr = math.Pow((finalValueAbs+2*initialValueAbs)/initialValueAbs, pow) - 1
+	case initialValue > 0 && finalValue < 0:
+		cagr = -1 * (math.Pow(finalValueAbs+2*initialValue, pow)/initialValue - 1)
 	}
 
 	return cagr, nil
+}
+
+// ExpectedReturn calculates the expected return of a company given a growth rate, FCF per share, and current value.
+//
+// Arguments:
+//
+// growthRate: The projected annual growth rate of the company.
+// cashPerShare: Cash (EPS or dividends) per share for the current period.
+// price: The current price per share.
+//
+// Returns:
+//
+// The expected return (CAGR) of the company at the given price and rate of growth.
+// An error, if any.
+func ExpectedReturn(
+	growthRate float64,
+	cashPerShare float64,
+	price float64,
+) (float64, error) {
+	if growthRate <= 0 {
+		return 0.0, fmt.Errorf("growth rate must be greater than zero")
+	}
+
+	if cashPerShare <= 0 {
+		return 0.0, fmt.Errorf("cash per share must be greater than zero")
+	}
+
+	if price <= 0 {
+		return 0.0, fmt.Errorf("price must be greater than zero")
+	}
+
+	expectedReturn := growthRate + (cashPerShare / price)
+
+	return expectedReturn, nil
 }
