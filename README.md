@@ -13,19 +13,33 @@
     <img src="docs/images/quickval.gif" width="800" alt="quickval cmd line example">
 </p>
 
-### Supported Valuation Models:
+## Supported Valuation Models:
 
 - DCF Growth-Exit Model
 - DCF Two-Stage Perpetual Growth Model
 - DDM Two-Stage Perpetual Growth Model
 
-### Disclaimer:
+## Disclaimer:
 
 Like any valuation model that attempts to predict future business prospects, `quickval` is not an accurate representation of future value. It serves as a yardstick measure of future value based on historical inputs, not future value.
 
 If you're looking to determine the true value of a company, well that's just not possible, so only use this as one of many inputs to determine a best guess.
 
-### Usage:
+## Install
+
+Download the latest binary from the [releases page](https://github.com/shanehull/quickval/releases) and place it in a directory
+that is in your PATH.
+
+For MacOS:
+
+```bash
+curl -L https://github.com/shanehull/quickval/releases/latest/download/quickval-darwin-amd64 -o \
+    /usr/local/bin/quickval && chmod +x /usr/local/bin/quickval
+```
+
+If you need a specific version, replace `latest` with the version number.
+
+## Usage:
 
 You can simply run `quickval` with no arguments to get started, however, to avoid being prompted for certain inputs, you can add arguments to the global command, e.g:
 
@@ -72,7 +86,7 @@ OPTIONS:
    --help, -h            show help
 ```
 
-### CV (Coefficient of Variance) Weighted WACC:
+## CV (Coefficient of Variance) Weighted WACC:
 
 You may notice an option when selecting the Discount Rate calculation method called "CV Weighted WACC".
 
