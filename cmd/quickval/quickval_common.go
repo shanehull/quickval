@@ -210,7 +210,7 @@ func fetchTickers(country string) ([]string, error) {
 }
 
 func fetchTickersFromGH(country string) ([]string, error) {
-	url := fmt.Sprintf(ghTickersURLFmt, country)
+	url := fmt.Sprintf(ghTickersURLFmt, strings.ToUpper(country))
 
 	client := &http.Client{
 		Timeout: time.Second * 10,
