@@ -3,8 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Report](https://goreportcard.com/badge/github.com/shanehull/quickval)](https://goreportcard.com/report/github.com/shanehull/quickval)
 
-[![Test Workflow](https://github.com/shanehull/quickval/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/shanehull/quickval/actions/workflows/test.yaml/badge.svg?branch=main)
-[![Lint Workflow](https://github.com/shanehull/quickval/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/shanehull/quickval/actions/workflows/lint.yaml/badge.svg?branch=main)
+[![Lint & Test](https://github.com/shanehull/quickval/actions/workflows/lint-and-test.yaml/badge.svg)](https://github.com/shanehull/quickval/actions/workflows/lint-and-test.yaml)
 [![Release Workflow](https://github.com/shanehull/quickval/actions/workflows/release.yaml/badge.svg?branch=release)](https://github.com/shanehull/quickval/actions/workflows/release.yaml/badge.svg?branch=release)
 
 `quickval` is an interactive CLI tool that leverages the free [QuickFS.net API](https://quickfs.net/features/public-api) to step through security valuations.
