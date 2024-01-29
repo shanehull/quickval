@@ -22,4 +22,4 @@ jobs:
         with:
           add: tickers/*
           message: "chore: update tickers [skip ci]"
-          push: tickers --set-upstream
+          push: origin tickers --set-upstream
