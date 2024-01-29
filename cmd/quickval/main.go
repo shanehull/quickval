@@ -16,31 +16,6 @@ var (
 	ticker  string
 )
 
-var (
-	searchTickers   []string
-	cacheDir        = "/tmp/quickval"
-	ghTickersURLFmt = "https://raw.githubusercontent.com/shanehull/quickval/main/tickers/%s.json"
-)
-
-var (
-	rfrPromptInfo       = "Enter a Risk-Rree Rate (e.g a 10-year average of a 10-year treasury bond yield)."
-	erpPromptInfo       = "Enter an ERP (Equity Risk Premium)."
-	discPromptInfo      = "Enter an explicit discount rate."
-	growthPromptInfo    = "Enter a reasonable growth rate, or accept the default (derived from a CAGR of the FCF or dividend history)."
-	fcfPromptInfo       = "Enter a current FCF (e.g. a normalised figure) or accept the most recent reported figure."
-	dividendsPromptInfo = "Enter a current Cash Paid for Dividends value (e.g. a normalised figure) or accept the most recent reported figure."
-	exitPromptInfo      = "Enter an appropriate exit multiple."
-	perpetualGrowthInfo = "Enter a growth rate for the perpetual/terminal growth stage."
-	fyHistoryPromptInfo = "Enter a FY history to retrieve for financial reports."
-)
-
-var (
-	defaultRFR           = 0.042
-	defaultPerpetualRate = 0.02
-	defaultExitMultiple  = 16.0
-	defaultERP           = 0.05
-)
-
 var bashCompletionsMode bool
 
 func main() {
