@@ -17,7 +17,7 @@ jobs:
         with:
           ref: tickers
       - name: Fetch Tickers
-        run: "go run ./cmd/fetch_tickers/fetch_tickers.go --api-key=${{ secrets.QUICKFS_KEY }}"
+        run: "go run ./cmd/fetch_tickers/main.go --api-key=${{ secrets.QUICKFS_KEY }}"
       - name: Commit Changes
         uses: EndBug/add-and-commit@v9
         with:
