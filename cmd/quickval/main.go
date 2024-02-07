@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -55,14 +54,12 @@ var app = &cli.App{
 			return nil
 		}
 
+		// do nothing if no args (help is printed and it exits)
 		if cCtx.NArg() == 0 {
-			err := cli.ShowAppHelp(cCtx)
-			if err != nil {
-				return err
-			}
-			return errors.New("a command is required")
+			return nil
 		}
 
+		// if we do have args, we'll need the common variables
 		return setCommonVars(cCtx)
 	},
 	Commands: []*cli.Command{
