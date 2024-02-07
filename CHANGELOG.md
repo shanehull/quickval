@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.1](https://github.com/shanehull/quickval/compare/v1.1.0...v1.1.1) (2024-02-07)
+
+
+### Bug Fixes
+
+* change tickers branch ([76f520d](https://github.com/shanehull/quickval/commit/76f520dbbc22732e42be4760d49f5db06c02b06a))
+* command test refactor ([7de5515](https://github.com/shanehull/quickval/commit/7de55157d90ce17384d480bde4f114d9bacc775c))
+* logic when no command is given ([d200b01](https://github.com/shanehull/quickval/commit/d200b0159620554b23229842c48ee395bd33adbe))
+
 ## [1.1.0](https://github.com/shanehull/quickval/compare/v1.0.0...v1.1.0) (2024-01-19)
 
 
