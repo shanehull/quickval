@@ -14,16 +14,19 @@ func testApp() *cli.App {
 }
 
 func AppRun_Test(t *testing.T) {
-	sg := testApp()
-
 	var out, err bytes.Buffer
-	sg.Writer = &out
-	sg.ErrWriter = &err
+
+	quickval := testApp()
+
+	quickval.Writer = &out
+	quickval.ErrWriter = &err
+
 	// check app launches up correctly
-	assert.NoError(t, sg.Run([]string{
+	assert.NoError(t, quickval.Run([]string{
 		"dcf",
 		"-h",
 	}))
+
 	// check that the output looks more or less correct
 	assert.Contains(t, out.String(), "Perform quick valuations using the QuickFS API")
 	assert.NotContains(t, out.String(), "error")
