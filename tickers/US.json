@@ -5105,6 +5105,7 @@
    "CCG:US",
    "SHPW:US",
    "BETR:US",
+   "COO:US",
    "AMAM:US",
    "GIA:US",
    "INAQ:US",
@@ -7561,7 +7562,6 @@
    "CODI:US",
    "COF:US",
    "COG:US",
-   "COO:US",
    "COP:US",
    "COT:US",
    "CP:US",
@@ -25901,5 +25901,6 @@
    "VLTLF:US",
    "LITSF:US",
    "IZMIF:US",
-   "YUMFF:US"
+   "YUMFF:US",
+   "STKKF:US"
 ]
