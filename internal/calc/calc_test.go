@@ -223,3 +223,40 @@ func Test_DDMTwoStage(t *testing.T) {
 		)
 	}
 }
+
+func Test_Upside_ValidInput(t *testing.T) {
+	expectedUpside := 0.5
+	targetPrice := 30.0
+	currentPrice := 20.0
+
+	upside, err := Upside(targetPrice, currentPrice)
+	if err != nil {
+		t.Errorf("Upside(%f, %f) unexpected error: %v", currentPrice, targetPrice, err)
+	}
+
+	if upside != expectedUpside {
+		t.Errorf(
+			"Upside(%f, %f) expected %f, got %f",
+			currentPrice,
+			targetPrice,
+			expectedUpside,
+			upside,
+		)
+	}
+}
+
+func Test_Upside_ZeroCurrentPrice(t *testing.T) {
+	targetPrice := 20.0
+	currentPrice := 0.0
+
+	_, err := Upside(targetPrice, currentPrice)
+
+	if err == nil || err.Error() != "current price must be greater than zero" {
+		t.Errorf(
+			"Upside(%f, %f) expected error 'current price must be greater than zero', got %v",
+			currentPrice,
+			targetPrice,
+			err,
+		)
+	}
+}

@@ -350,3 +350,28 @@ func ExpectedReturn(
 
 	return expectedReturn, nil
 }
+
+// Upside calculates the upside of the investment based on the price target and the current price.
+//
+// Arguments:
+//
+// targetPrice: The target price of the investment.
+// currentPrice: The current price of the investment.
+//
+// # Returns
+//
+// The upside of the investment.
+// An error, if any.
+func Upside(targetPrice float64, currentPrice float64) (float64, error) {
+	if targetPrice <= 0 {
+		return 0.0, fmt.Errorf("target price must be greater than zero")
+	}
+
+	if currentPrice <= 0 {
+		return 0.0, fmt.Errorf("current price must be greater than zero")
+	}
+
+	upside := (targetPrice - currentPrice) / currentPrice
+
+	return upside, nil
+}

@@ -101,7 +101,12 @@ var growthExitCommand = &cli.Command{
 			return err
 		}
 
-		writer.Projected(projectedFCF, growthRate, expectedReturn)
+		upside, err := calc.Upside(fairValue, data.Price)
+		if err != nil {
+			return err
+		}
+
+		writer.Projected(projectedFCF, growthRate, expectedReturn, upside)
 		writer.FairValue(fairValue)
 		writer.Render()
 

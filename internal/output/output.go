@@ -48,29 +48,35 @@ func (w *Writer) WACC(rate float64, erp float64, rfr float64, data *quickfs.Data
 	w.table.Append([]string{"", ""})
 	w.table.Append([]string{"DISCOUNT RATE (WACC)", ""})
 	w.table.Append([]string{"----------------------------------------", "------------------"})
-	w.table.Append([]string{"Equity Risk Premium", fmt.Sprintf("%.2f", erp)})
-	w.table.Append([]string{"Risk Free Rate", fmt.Sprintf("%.2f", rfr)})
+	w.table.Append([]string{"Equity Risk Premium", fmt.Sprintf("%.3f", erp)})
+	w.table.Append([]string{"Risk Free Rate", fmt.Sprintf("%.3f", rfr)})
 	if data.DebtToEquity != 0 {
-		w.table.Append([]string{"Debt to Equity Ratio", fmt.Sprintf("%.2f", data.DebtToEquity)})
+		w.table.Append([]string{"Debt to Equity Ratio", fmt.Sprintf("%.3f", data.DebtToEquity)})
 	}
 	if data.TaxRate != 0 {
-		w.table.Append([]string{"Tax Rate", fmt.Sprintf("%.2f", data.TaxRate)})
+		w.table.Append([]string{"Tax Rate", fmt.Sprintf("%.3f", data.TaxRate)})
 	}
 	if data.Beta != 0 {
-		w.table.Append([]string{"Beta", fmt.Sprintf("%.2f", data.Beta)})
+		w.table.Append([]string{"Beta", fmt.Sprintf("%.3f", data.Beta)})
 	}
 	w.table.Append([]string{"", ""})
-	w.table.Append([]string{"Discount Rate", fmt.Sprintf("%.2f", rate)})
+	w.table.Append([]string{"Discount Rate", fmt.Sprintf("%.3f", rate)})
 
 	w.table.Append([]string{"", ""})
 }
 
-func (w *Writer) Projected(projected []int, growthRate float64, expectedReturn float64) {
+func (w *Writer) Projected(
+	projected []int,
+	growthRate float64,
+	expectedReturn float64,
+	upside float64,
+) {
 	w.table.Append([]string{"", ""})
 	w.table.Append([]string{"PROJECTIONS", ""})
 	w.table.Append([]string{"----------------------------------------", "------------------"})
-	w.table.Append([]string{"Growth Rate", fmt.Sprintf("%.2f", growthRate)})
-	w.table.Append([]string{"Expected Return", fmt.Sprintf("%.2f", expectedReturn)})
+	w.table.Append([]string{"Growth Rate (CAGR)", fmt.Sprintf("%.2f", growthRate)})
+	w.table.Append([]string{"Expected Return (CAGR)", fmt.Sprintf("%.2f", expectedReturn)})
+	w.table.Append([]string{"Current Upside", fmt.Sprintf("%.2f", upside)})
 	w.table.Append([]string{"", ""})
 
 	// append projections
