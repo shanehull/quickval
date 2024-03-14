@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/shanehull/quickval/compare/v1.1.1...v1.2.0) (2024-03-14)
+
+
+### Features
+
+* price uspide guidance in projections ([ad78a08](https://github.com/shanehull/quickval/commit/ad78a08266868a48349317bde4d91e09b2fa2c16))
+
 ## [1.1.1](https://github.com/shanehull/quickval/compare/v1.1.0...v1.1.1) (2024-02-07)
 
 
