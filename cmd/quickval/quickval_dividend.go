@@ -120,7 +120,12 @@ var dividendDiscountCommand = &cli.Command{
 			return err
 		}
 
-		writer.Projected(projectedDividends, growthRate, expectedReturn)
+		upside, err := calc.Upside(fairValue, data.Price)
+		if err != nil {
+			return err
+		}
+
+		writer.Projected(projectedDividends, growthRate, expectedReturn, upside)
 		writer.FairValue(fairValue)
 		writer.Render()
 		return nil
