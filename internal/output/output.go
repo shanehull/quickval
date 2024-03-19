@@ -22,6 +22,7 @@ func NewWriter(file *os.File) *Writer {
 }
 
 func (w *Writer) Data(data *quickfs.Data) {
+	w.table.Append([]string{"", ""})
 	w.table.Append([]string{"FY HISTORIC DATA", ""})
 	w.table.Append([]string{"----------------------------------------", "------------------"})
 
@@ -60,7 +61,7 @@ func (w *Writer) WACC(rate float64, erp float64, rfr float64, data *quickfs.Data
 		w.table.Append([]string{"Beta", fmt.Sprintf("%.3f", data.Beta)})
 	}
 	w.table.Append([]string{"", ""})
-	w.table.Append([]string{"Discount Rate", fmt.Sprintf("%.3f", rate)})
+	w.table.Append([]string{"Discount Rate", fmt.Sprintf("%.2f", rate)})
 
 	w.table.Append([]string{"", ""})
 }
@@ -74,10 +75,6 @@ func (w *Writer) Projected(
 	w.table.Append([]string{"", ""})
 	w.table.Append([]string{"PROJECTIONS", ""})
 	w.table.Append([]string{"----------------------------------------", "------------------"})
-	w.table.Append([]string{"Growth Rate (CAGR)", fmt.Sprintf("%.2f", growthRate)})
-	w.table.Append([]string{"Expected Return (CAGR)", fmt.Sprintf("%.2f", expectedReturn)})
-	w.table.Append([]string{"Current Upside", fmt.Sprintf("%.2f", upside)})
-	w.table.Append([]string{"", ""})
 
 	// append projections
 	for year, value := range projected {
@@ -86,6 +83,11 @@ func (w *Writer) Projected(
 		row := []string{label, formattedValue}
 		w.table.Append(row)
 	}
+
+	w.table.Append([]string{"", ""})
+	w.table.Append([]string{"Growth Rate (CAGR)", fmt.Sprintf("%.2f", growthRate)})
+	w.table.Append([]string{"Expected Return (CAGR)", fmt.Sprintf("%.2f", expectedReturn)})
+	w.table.Append([]string{"Potential Upside", fmt.Sprintf("%.2f", upside)})
 }
 
 func (w *Writer) DiscountRate(rate float64) {
