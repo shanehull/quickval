@@ -2296,5 +2296,11 @@
    "ECOB:LN",
    "GSC:LN",
    "FIXP:LN",
-   "FWT:LN"
+   "FWT:LN",
+   "JUGI:LN",
+   "REE:LN",
+   "PINT:LN",
+   "ULTP:LN",
+   "CRTA:LN",
+   "FLTR:LN"
 ]
