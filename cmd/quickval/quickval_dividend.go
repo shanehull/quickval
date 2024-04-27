@@ -78,6 +78,7 @@ var dividendDiscountCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
 		currentDividends, err := getFlagOrPromptInt(
 			cCtx,
 			"current-dividends",
@@ -88,6 +89,7 @@ var dividendDiscountCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
 		perpetualRate, err := getFlagOrPromptFloat(
 			cCtx,
 			"perpetual-rate",

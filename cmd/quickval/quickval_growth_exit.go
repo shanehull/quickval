@@ -59,6 +59,7 @@ var growthExitCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
 		currentFCF, err := getFlagOrPromptInt(
 			cCtx,
 			"current-fcf",
@@ -69,6 +70,7 @@ var growthExitCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
 		exitMultiple, err := getFlagOrPromptFloat(
 			cCtx,
 			"exit-multiple",

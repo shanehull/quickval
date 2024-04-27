@@ -74,6 +74,7 @@ var twoStageCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
 		currentFCF, err := getFlagOrPromptInt(
 			cCtx,
 			"current-fcf",
@@ -84,6 +85,7 @@ var twoStageCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
 		perpetualRate, err := getFlagOrPromptFloat(
 			cCtx,
 			"perpetual-rate",
