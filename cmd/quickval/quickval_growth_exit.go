@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"os"
 
 	"github.com/shanehull/quickval/internal/calc"
@@ -71,12 +72,16 @@ var growthExitCommand = &cli.Command{
 			return err
 		}
 
+		currentMultipleFloor := math.Floor(
+			data.Price / (float64(currentFCF) / float64(data.Shares)),
+		)
+
 		exitMultiple, err := getFlagOrPromptFloat(
 			cCtx,
 			"exit-multiple",
 			"Exit Multiple",
 			exitPromptInfo,
-			defaultExitMultiple,
+			currentMultipleFloor,
 		)
 		if err != nil {
 			return err
