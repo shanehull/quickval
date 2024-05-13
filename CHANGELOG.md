@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/shanehull/quickval/compare/v1.1.1...v1.2.0) (2024-05-13)
+
+
+### Features
+
+* price uspide guidance in projections ([ad78a08](https://github.com/shanehull/quickval/commit/ad78a08266868a48349317bde4d91e09b2fa2c16))
+* suggest a default exit multiple ([5c37bf1](https://github.com/shanehull/quickval/commit/5c37bf16e6f2bdab9a44b5ae0b39566cf945bf03))
+
+
+### Bug Fixes
+
+* re-arrange projections ([e990b90](https://github.com/shanehull/quickval/commit/e990b90b8fcdcba389dfd882963c2d389c722772))
+
 ## [1.1.1](https://github.com/shanehull/quickval/compare/v1.1.0...v1.1.1) (2024-02-07)
 
 
