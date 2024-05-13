@@ -33,7 +33,7 @@ var (
 	growthPromptInfo    = "Enter a reasonable growth rate, or accept the default (derived from a CAGR of the FCF or dividend history)."
 	fcfPromptInfo       = "Enter a current FCF (e.g. a normalised figure) or accept the most recent reported figure."
 	dividendsPromptInfo = "Enter a current Cash Paid for Dividends value (e.g. a normalised figure) or accept the most recent reported figure."
-	exitPromptInfo      = "Enter an appropriate exit multiple."
+	exitPromptInfo      = "Enter an exit multiple, or accept the current P/FCF (rounded down)."
 	perpetualGrowthInfo = "Enter a growth rate for the perpetual/terminal growth stage."
 	fyHistoryPromptInfo = "Enter a FY history to retrieve for financial reports."
 )
@@ -41,7 +41,6 @@ var (
 var (
 	defaultRFR           = 0.042
 	defaultPerpetualRate = 0.02
-	defaultExitMultiple  = 16.0
 	defaultERP           = 0.05
 )
 
