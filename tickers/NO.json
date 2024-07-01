@@ -361,5 +361,8 @@
    "CAVEN:NO",
    "PUBLI:NO",
    "AIX:NO",
-   "KNOX:NO"
+   "KNOX:NO",
+   "FFSB:NO",
+   "STST:NO",
+   "SACAM:NO"
 ]
