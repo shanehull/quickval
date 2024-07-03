@@ -5624,6 +5624,8 @@
    "TEM:US",
    "WAY:US",
    "CPBI:US",
+   "LSH:US",
+   "ALMS:US",
    "PAAS:US",
    "STEL:US",
    "RNST:US",
@@ -26900,5 +26902,13 @@
    "RGXTD:US",
    "SGNLF:US",
    "STLRF:US",
-   "TOUBF:US"
+   "TOUBF:US",
+   "NHPCF:US",
+   "PRMMF:US",
+   "POWMF:US",
+   "ZEOOY:US",
+   "NETLF:US",
+   "PKBO:US",
+   "NLLRF:US",
+   "SEVCF:US"
 ]
