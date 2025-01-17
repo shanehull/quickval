@@ -1,7 +1,6 @@
 [
    "BATS:US",
    "CBOE:US",
-   "VHAI:US",
    "MSFT:US",
    "PFG:US",
    "PFIE:US",
@@ -26660,6 +26659,7 @@
    "CBDW:US",
    "KARX:US",
    "QTHLF:US",
+   "VHAI:US",
    "NPLS:US",
    "SAMHF:US",
    "DMSL:US",
