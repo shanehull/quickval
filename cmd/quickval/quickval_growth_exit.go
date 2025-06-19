@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"os"
 
 	"github.com/shanehull/quickval/internal/calc"
@@ -59,6 +60,7 @@ var growthExitCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
 		currentFCF, err := getFlagOrPromptInt(
 			cCtx,
 			"current-fcf",
@@ -69,12 +71,17 @@ var growthExitCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
+		currentMultipleFloor := math.Floor(
+			data.Price / (float64(currentFCF) / float64(data.Shares)),
+		)
+
 		exitMultiple, err := getFlagOrPromptFloat(
 			cCtx,
 			"exit-multiple",
 			"Exit Multiple",
 			exitPromptInfo,
-			defaultExitMultiple,
+			currentMultipleFloor,
 		)
 		if err != nil {
 			return err
@@ -101,7 +108,12 @@ var growthExitCommand = &cli.Command{
 			return err
 		}
 
-		writer.Projected(projectedFCF, growthRate, expectedReturn)
+		upside, err := calc.Upside(fairValue, data.Price)
+		if err != nil {
+			return err
+		}
+
+		writer.Projected(projectedFCF, growthRate, expectedReturn, upside)
 		writer.FairValue(fairValue)
 		writer.Render()
 

@@ -78,6 +78,7 @@ var dividendDiscountCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
 		currentDividends, err := getFlagOrPromptInt(
 			cCtx,
 			"current-dividends",
@@ -88,6 +89,7 @@ var dividendDiscountCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
 		perpetualRate, err := getFlagOrPromptFloat(
 			cCtx,
 			"perpetual-rate",
@@ -120,7 +122,12 @@ var dividendDiscountCommand = &cli.Command{
 			return err
 		}
 
-		writer.Projected(projectedDividends, growthRate, expectedReturn)
+		upside, err := calc.Upside(fairValue, data.Price)
+		if err != nil {
+			return err
+		}
+
+		writer.Projected(projectedDividends, growthRate, expectedReturn, upside)
 		writer.FairValue(fairValue)
 		writer.Render()
 		return nil

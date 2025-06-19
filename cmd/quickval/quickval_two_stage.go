@@ -74,6 +74,7 @@ var twoStageCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
 		currentFCF, err := getFlagOrPromptInt(
 			cCtx,
 			"current-fcf",
@@ -84,6 +85,7 @@ var twoStageCommand = &cli.Command{
 		if err != nil {
 			return err
 		}
+
 		perpetualRate, err := getFlagOrPromptFloat(
 			cCtx,
 			"perpetual-rate",
@@ -116,7 +118,12 @@ var twoStageCommand = &cli.Command{
 			return err
 		}
 
-		writer.Projected(projectedFCF, growthRate, expectedReturn)
+		upside, err := calc.Upside(fairValue, data.Price)
+		if err != nil {
+			return err
+		}
+
+		writer.Projected(projectedFCF, growthRate, expectedReturn, upside)
 		writer.FairValue(fairValue)
 		writer.Render()
 		return nil
