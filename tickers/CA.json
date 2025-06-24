@@ -1095,6 +1095,7 @@
    "ZEUS:CA",
    "PHOS:CA",
    "MBAI:CA",
+   "QQQ:CA",
    "VRNO:CA",
    "CURA:CA",
    "CCHW:CA",
@@ -2457,6 +2458,7 @@
    "DESG:CA",
    "HOTD:CA",
    "ACX:CA",
+   "MTSU:CA",
    "RARE:CA",
    "SGD:CA",
    "ACDC:CA",
@@ -5461,5 +5463,8 @@
    "OCI:CA",
    "NTB:CA",
    "OVL.H:CA",
-   "SN.H:CA"
+   "SN.H:CA",
+   "KRI:CA",
+   "DDD:CA",
+   "CCIC.P:CA"
 ]
