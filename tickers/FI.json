@@ -207,5 +207,10 @@
    "LINDEX:FI",
    "KSL:FI",
    "HKFOODS:FI",
-   "FARON:FI"
+   "FARON:FI",
+   "SFOODS:FI",
+   "CANATU:FI",
+   "BEER:FI",
+   "REBL:FI",
+   "SUMMA:FI"
 ]
