@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/shanehull/quickval/compare/v1.2.0...v1.3.0) (2026-02-03)
+
+
+### Features
+
+* use charm huh for input ([#54](https://github.com/shanehull/quickval/issues/54)) ([353ae2f](https://github.com/shanehull/quickval/commit/353ae2f761957a200239674b473ecd6832a28a7d))
+
 ## [1.2.0](https://github.com/shanehull/quickval/compare/v1.1.1...v1.2.0) (2024-05-13)
 
 
