@@ -244,7 +244,9 @@ func fetchTickersFromGH(country string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error sending request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	if resp.StatusCode/100 != 2 {
 		return nil, fmt.Errorf("received non-200 status code: %d", resp.StatusCode)
@@ -294,10 +296,12 @@ func atomicWrite(filename string, data []byte, perms fs.FileMode) error {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(tmpFile.Name()) // Cleanup the temporary file
+	defer func() {
+		_ = os.Remove(tmpFile.Name()) // Cleanup the temporary file
+	}()
 
 	if _, err := tmpFile.Write(data); err != nil {
-		tmpFile.Close()
+		_ = tmpFile.Close()
 		return err
 	}
 	if err := tmpFile.Close(); err != nil {

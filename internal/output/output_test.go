@@ -8,12 +8,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func WriterRender_Test(t *testing.T) {
+func WriterRenderTest(t *testing.T) {
 	tmpfile, err := os.CreateTemp("", "example")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(tmpfile.Name())
+	defer func() {
+		_ = os.Remove(tmpfile.Name())
+	}()
 
 	w := NewWriter(tmpfile)
 
