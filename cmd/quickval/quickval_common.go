@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/manifoldco/promptui"
+	"github.com/charmbracelet/huh"
 	"github.com/shanehull/quickval/internal/calc"
 	"github.com/shanehull/quickval/internal/output"
 	"github.com/shanehull/quickval/internal/quickfs"
@@ -244,7 +244,9 @@ func fetchTickersFromGH(country string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error sending request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	if resp.StatusCode/100 != 2 {
 		return nil, fmt.Errorf("received non-200 status code: %d", resp.StatusCode)
@@ -294,10 +296,12 @@ func atomicWrite(filename string, data []byte, perms fs.FileMode) error {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(tmpFile.Name()) // Cleanup the temporary file
+	defer func() {
+		_ = os.Remove(tmpFile.Name()) // Cleanup the temporary file
+	}()
 
 	if _, err := tmpFile.Write(data); err != nil {
-		tmpFile.Close()
+		_ = tmpFile.Close()
 		return err
 	}
 	if err := tmpFile.Close(); err != nil {
@@ -354,161 +358,153 @@ func printTip(info string) {
 func promptKey() (string, error) {
 	printTip("Enter a valid API key for QuickFS.")
 
-	validate := func(input string) error {
-		if input == "" {
-			return errors.New("input cannot be empty")
-		}
-
-		r, _ := regexp.Compile("^[a-z0-9]{40}$")
-
-		m := r.MatchString(input)
-		if !m {
-			return errors.New("invalid api key")
-		}
-		return nil
-	}
-
-	s := promptui.Prompt{
-		Label:       "API Key",
-		Validate:    validate,
-		Mask:        '*',
-		HideEntered: true,
-	}
-
-	response, err := s.Run()
+	var apiKeyInput string
+	err := huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Title("API Key").
+				Placeholder("").
+				EchoMode(huh.EchoModePassword).
+				Validate(func(s string) error {
+					if s == "" {
+						return errors.New("input cannot be empty")
+					}
+					r, _ := regexp.Compile("^[a-z0-9]{40}$")
+					if !r.MatchString(s) {
+						return errors.New("invalid api key format")
+					}
+					return nil
+				}).
+				Value(&apiKeyInput),
+		),
+	).Run()
 	if err != nil {
 		return "", fmt.Errorf("an error occurred when setting the api key: %s", err)
 	}
 
-	return response, nil
+	return apiKeyInput, nil
 }
 
 func selectTicker(country string) (string, error) {
 	printTip("Start typing to find your ticker.")
 
-	tickers, err := fetchTickers(country)
-	if err != nil {
-		return "", fmt.Errorf("an error occurred when fetching ticker: %s", err)
+	tickers, _ := fetchTickers(country)
+
+	if len(tickers) == 0 {
+		return "", fmt.Errorf("no tickers available for country %s", country)
 	}
 
-	searcher := func(input string, index int) bool {
-		ticker := strings.ToLower(tickers[index])
-		input = strings.ReplaceAll(strings.ToLower(input), " ", "")
-		return strings.HasPrefix(ticker, input)
-	}
+	huhOptions := convertToHuhOptions(tickers)
 
-	s := promptui.Select{
-		Label:             "Ticker",
-		Items:             tickers,
-		Searcher:          searcher,
-		StartInSearchMode: true,
-	}
-
-	_, response, err := s.Run()
+	var selectedTicker string
+	err := huh.NewForm(
+		huh.NewGroup(
+			huh.NewSelect[string]().
+				Title("Ticker").
+				Options(huhOptions...).
+				Filtering(true).
+				// FilterFunc(func(option huh.Option[string], input string) bool {
+				// 	return strings.HasPrefix(strings.ToLower(option.Label()), strings.ToLower(input))
+				// }).
+				Height(8).
+				Value(&selectedTicker),
+		),
+	).Run()
 	if err != nil {
 		return "", fmt.Errorf("an error occurred when setting the ticker: %s", err)
 	}
 
-	return response, nil
+	fmt.Printf("Ticker selected: %s\n", selectedTicker)
+	return selectedTicker, nil
 }
 
 func selectCountry() (string, error) {
 	printTip("Select the country that your ticker trades in.")
 
-	searcher := func(input string, index int) bool {
-		ticker := strings.ToLower(quickfs.CountryCodes[index])
-		input = strings.ReplaceAll(strings.ToLower(input), " ", "")
-		return strings.Contains(ticker, input)
-	}
+	countryCodes := quickfs.CountryCodes
+	huhOptions := convertToHuhOptions(countryCodes)
 
-	s := promptui.Select{
-		Label:             "Country",
-		Items:             quickfs.CountryCodes,
-		Searcher:          searcher,
-		StartInSearchMode: true,
-	}
-
-	_, response, err := s.Run()
+	var selectedCountry string
+	err := huh.NewForm(
+		huh.NewGroup(
+			huh.NewSelect[string]().
+				Title("Country").
+				Options(huhOptions...).
+				Filtering(true).
+				Height(8).
+				Value(&selectedCountry),
+		),
+	).Run()
 	if err != nil {
 		return "", fmt.Errorf("an error occurred when setting the country: %s", err)
 	}
 
-	return response, nil
+	fmt.Printf("Country selected: %s\n", selectedCountry)
+	return selectedCountry, nil
 }
 
 func promptInt(label string, def int, info string) (int, error) {
-	var val int
+	valStr := fmt.Sprint(def)
 
 	if info != "" {
 		printTip(info)
 	}
 
-	validate := func(input string) error {
-		if input == "" {
-			return errors.New("input cannot be empty")
-		}
-
-		parsedInput, err := strconv.ParseInt(input, 10, 0)
-		if err != nil {
-			return errors.New("please enter a valid int number")
-		}
-
-		val = int(parsedInput)
-
-		return nil
-	}
-
-	s := promptui.Prompt{
-		Label:     label,
-		Validate:  validate,
-		AllowEdit: true,
-		Default:   fmt.Sprint(def),
-	}
-
-	_, err := s.Run()
+	err := huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Title(label).
+				Value(&valStr).
+				Validate(func(s string) error {
+					if s == "" {
+						return errors.New("input cannot be empty")
+					}
+					if _, err := strconv.ParseInt(s, 10, 0); err != nil {
+						return errors.New("please enter a valid integer")
+					}
+					return nil
+				}),
+		),
+	).Run()
 	if err != nil {
 		return 0, err
 	}
 
-	return val, nil
+	val, _ := strconv.ParseInt(valStr, 10, 0)
+	fmt.Printf("%s selected: %d\n", label, val)
+	return int(val), nil
 }
 
 func promptFloat(label string, def float64, info string) (float64, error) {
-	var val float64
+	sDef := strconv.FormatFloat(def, 'g', 5, 64)
+	valStr := sDef
 
 	if info != "" {
 		printTip(info)
 	}
 
-	validate := func(input string) error {
-		if input == "" {
-			return errors.New("input cannot be empty")
-		}
-
-		parsedInput, err := strconv.ParseFloat(input, 64)
-		if err != nil {
-			return errors.New("please enter a valid float number")
-		}
-
-		val = parsedInput
-
-		return nil
-	}
-
-	sDef := strconv.FormatFloat(def, 'g', 5, 64)
-
-	s := promptui.Prompt{
-		Label:     label,
-		Validate:  validate,
-		AllowEdit: true,
-		Default:   sDef,
-	}
-
-	_, err := s.Run()
+	err := huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Title(label).
+				Value(&valStr).
+				Validate(func(s string) error {
+					if s == "" {
+						return errors.New("input cannot be empty")
+					}
+					if _, err := strconv.ParseFloat(s, 64); err != nil {
+						return errors.New("please enter a valid float number")
+					}
+					return nil
+				}),
+		),
+	).Run()
 	if err != nil {
 		return 0.00, err
 	}
 
+	val, _ := strconv.ParseFloat(valStr, 64)
+	fmt.Printf("%s selected: %.4f\n", label, val)
 	return val, nil
 }
 
@@ -554,15 +550,29 @@ func selectDiscountRateOpt() string {
 		"There are a few options for calculating a discount rate. Choose which one you would like to use.",
 	)
 
-	s := promptui.Select{
-		Label: "Discount Rate Options",
-		Items: []string{"WACC", "CV Weighted WACC", "Custom Input"},
-	}
-
-	_, response, err := s.Run()
+	var selected string
+	options := []string{"WACC", "CV Weighted WACC", "Custom Input"}
+	err := huh.NewForm(
+		huh.NewGroup(
+			huh.NewSelect[string]().
+				Title("Discount Rate Options").
+				Options(convertToHuhOptions(options)...).
+				Value(&selected),
+		),
+	).Run()
 	if err != nil {
 		return ""
 	}
 
-	return response
+	fmt.Printf("Discount Rate Option selected: %s\n", selected)
+	return selected
+}
+
+// Helper function to convert string slices to huh.Option slices
+func convertToHuhOptions(items []string) []huh.Option[string] {
+	options := make([]huh.Option[string], len(items))
+	for i, item := range items {
+		options[i] = huh.NewOption(item, item)
+	}
+	return options
 }

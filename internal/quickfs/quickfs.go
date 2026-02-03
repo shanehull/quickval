@@ -253,7 +253,8 @@ func (q *quickFS) setHeaders(req *http.Request) {
 func (q *quickFS) formatQFS(ticker, country, metric string, args ...interface{}) string {
 	field := fmt.Sprintf("QFS(%s:%s,%s", ticker, country, metric)
 	if len(args) > 0 {
-		field += fmt.Sprintf(",%s)", fmt.Sprintf(args[0].(string)))
+		argStr := args[0].(string)
+		field += fmt.Sprintf(",%s)", argStr)
 	} else {
 		field += ")"
 	}
@@ -271,7 +272,8 @@ func (q *quickFS) formatOptionalQFS(
 	if condition {
 		*field = fmt.Sprintf("QFS(%s:%s,%s", ticker, country, metric)
 		if len(args) > 0 {
-			*field += fmt.Sprintf(",%s)", fmt.Sprintf(args[0].(string)))
+			argStr := args[0].(string)
+			*field += fmt.Sprintf(",%s)", argStr)
 		} else {
 			*field += ")"
 		}
