@@ -33,13 +33,22 @@ jobs:
           xgo_version: latest
           go_version: 1.25.x
           pkg: cmd/quickval/
-          dest: build
+          dest: bin
           prefix: quickval
           targets: linux/amd64,darwin/amd64,darwin/arm64,windows/amd64,
           v: true
           ldflags: -s -w
+      - name: Generate Checkums
+        if: ${{ steps.release-please.outputs.release_created }}
+        run: |
+          cd bin
+          for file in *; do
+              if [ -f "$file" ]; then
+                  echo "$file: sha256-$(sha256sum "$file" | awk '{ print $1 }' | xxd -r -p | base64)" >> checksums.txt
+              fi
+          done
       - name: Upload Release Binaries
         if: ${{ steps.release-please.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ steps.release-please.outputs.tag_name }} ./build/*
+        run: gh release upload ${{ steps.release-please.outputs.tag_name }} ./bin/*
